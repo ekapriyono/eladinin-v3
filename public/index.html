@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Ladinin v3.0 • Portal Layanan Digital Dinas Pendidikan</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .hero-3d-bg {
+            background: radial-gradient(120% 120% at 50% -10%, #0b1329 0%, #1e3a8a 55%, #0f172a 100%);
+        }
+
+        .card-3d {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.01);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+        }
+        .card-3d:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 25px 35px -10px rgba(30, 58, 138, 0.15), 0 15px 15px -10px rgba(30, 58, 138, 0.08);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .glass-3d {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.2), 0 8px 16px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon-box-3d {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.25), inset 0 2px 3px 0 rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Live Announcement Banner -->
+    <div id="announcementBar" class="hidden bg-amber-500 text-white text-xs font-semibold py-2.5 px-6 shadow-md border-b border-amber-600/40">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-x-2">
+                <i class="fa-solid fa-bullhorn animate-bounce text-sm"></i>
+                <span id="announcementText">PENGUMUMAN: ...</span>
+            </div>
+            <button onclick="document.getElementById('announcementBar').remove()" class="text-white/80 hover:text-white">&times;</button>
+        </div>
+    </div>
+
+    <!-- Topbar Banner Resmi -->
+    <div class="bg-slate-950 text-slate-300 text-xs py-2 px-6 border-b border-slate-800/80">
+        <div class="max-w-screen-xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-x-2">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>Portal Layanan Publik Resmi Dinas Pendidikan Kabupaten Bangkalan</span>
+            </div>
+            <div class="hidden sm:flex items-center gap-x-6 text-slate-400">
+                <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
+                <span><i class="fa-solid fa-headset mr-1"></i> Layanan Pengaduan</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <nav class="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-screen-xl mx-auto px-6 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-x-3.5">
+                <img src="/logo.jpg" alt="Logo E-Ladinin" class="h-11 w-auto object-contain rounded-xl shadow-md" />
+                <div>
+                    <div class="flex items-center gap-x-2">
+                        <span class="font-extrabold text-xl tracking-tight text-slate-900">E-LADININ</span>
+                        <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">OFFICIAL 3.0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium hidden sm:block">Elektronik Layanan Dinas Pendidikan</p>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-x-8 text-sm font-semibold text-slate-600">
+                <a href="#" class="hover:text-blue-700 transition-colors">Beranda</a>
+                <a href="#layanan" class="text-blue-700 font-bold">Daftar Layanan</a>
+                <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
+            </div>
+            
+            <div>
+                <button onclick="showAdminModal()" class="flex items-center gap-x-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-xl transition-all shadow-sm">
+                    <i class="fa-solid fa-user-lock text-slate-500"></i>
+                    <span>Panel Admin</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section 3D -->
+    <header class="hero-3d-bg text-white relative overflow-hidden py-16">
+        <div class="max-w-screen-xl mx-auto px-6 relative z-10">
+            <div class="flex flex-wrap items-center gap-3 mb-8">
+                <!-- BADGE WAKTU REALTIME -->
+                <div class="glass-3d text-blue-100 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-x-2.5 shadow-lg">
+                    <i class="fa-regular fa-clock text-blue-300 text-sm animate-spin"></i>
+                    <span id="realtimeClock" class="font-mono tracking-wide">Memuat waktu...</span>
+                </div>
+
+                <!-- BADGE HITUNG KUNJUNGAN -->
+                <div class="glass-3d text-emerald-200 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-x-2.5 shadow-lg">
+                    <i class="fa-solid fa-chart-line text-emerald-400 text-sm"></i>
+                    <span>Diakses oleh <strong class="font-bold text-white text-sm ml-1" id="visitCountDisplay">...</strong> Pengguna</span>
+                </div>
+            </div>
+
+            <div class="max-w-3xl">
+                <span class="inline-block px-3.5 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold rounded-lg mb-4 tracking-wider uppercase backdrop-blur-md">
+                    Portal Digital Resmi
+                </span>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-6 text-white drop-shadow-md">
+                    Elektronik Layanan Dinas Pendidikan
+                </h1>
+                <p class="text-slate-300 text-base sm:text-lg font-normal leading-relaxed mb-8 max-w-2xl">
+                    Layanan Online terpadu yang transparan, cepat, dan akuntabel. Akses kebutuhan administrasi pendidikan Anda kapan saja.
+                </p>
+            </div>
+
+            <!-- Interaktif Filter & Search Bar 3D -->
+            <div class="glass-3d p-4 rounded-2xl max-w-4xl shadow-2xl flex flex-col md:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400"></i>
+                    <input type="text" id="searchInput" onkeyup="filterServices()" placeholder="Cari nama layanan atau kata kunci..." 
+                           class="w-full pl-11 pr-4 py-2.5 bg-white/90 text-slate-800 placeholder-slate-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner">
+                </div>
+                <select id="categoryFilter" onchange="filterServices()" class="px-4 py-2.5 bg-white/90 text-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                    <option value="ALL">Semua Kategori</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Widget SKM Futuristis 3D (Indeks Survei Kepuasan Masyarakat) -->
+    <section class="max-w-screen-xl mx-auto px-6 -mt-10 relative z-20 mb-12">
+        <div class="card-3d bg-slate-900/90 text-white rounded-3xl p-6 md:p-8 backdrop-blur-xl border border-blue-500/30 shadow-2xl relative overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
+                <div class="md:col-span-5 flex items-center gap-6 border-b md:border-b-0 md:border-r border-slate-800 pb-6 md:pb-0 md:pr-6">
+                    <div class="relative">
+                        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-800 p-0.5 shadow-xl shadow-blue-600/30">
+                            <div class="w-full h-full bg-slate-950 rounded-[14px] flex flex-col items-center justify-center">
+                                <span id="skmNilai" class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 font-mono">00.00</span>
+                                <span class="text-[9px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Skala 100</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="skmMutu" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-extrabold px-2.5 py-0.5 rounded-md">MUTU A</span>
+                            <span id="skmKinerja" class="text-xs font-bold text-slate-300">Sangat Baik</span>
+                        </div>
+                        <h3 class="text-lg font-extrabold text-white tracking-tight">Indeks Kepuasan Masyarakat</h3>
+                        <p class="text-xs text-blue-400 font-mono mt-0.5" id="skmPeriode">Periode: Memuat...</p>
+                    </div>
+                </div>
+
+                <div class="md:col-span-7 space-y-2">
+                    <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        <i class="fa-solid fa-chart-pie text-blue-400"></i>
+                        <span>Ringkasan Hasil Evaluasi SKM</span>
+                    </div>
+                    <p id="skmCatatan" class="text-xs md:text-sm text-slate-300 leading-relaxed">
+                        Memuat catatan evaluasi survei kepuasan...
+                    </p>
+                    <div class="pt-1 flex items-center gap-x-4 text-[11px] text-slate-400">
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle-check text-emerald-400"></i> Transparan</span>
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-users text-blue-400"></i> Berbasis Responden Real</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content: Catalog Layanan -->
+    <section id="layanan" class="max-w-screen-xl mx-auto px-6 py-8 flex-grow">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-y-4">
+            <div>
+                <div class="flex items-center gap-x-2 text-blue-700 font-bold text-xs uppercase tracking-widest mb-2">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Katalog Digital</span>
+                </div>
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Daftar Layanan Tersedia</h2>
+            </div>
+        </div>
+        
+        <!-- Grid Layanan 3D -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="services-grid">
+            <div class="col-span-full text-center py-16 text-slate-400">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-blue-600"></i>
+                <p class="text-sm font-medium">Memuat katalog layanan dinamis...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section FAQ Dinamis -->
+    <section id="faq" class="bg-slate-200/60 border-t border-slate-300/60 py-16">
+        <div class="max-w-screen-xl mx-auto px-6">
+            <h2 class="text-2xl font-bold text-slate-900 mb-8 text-center"><i class="fa-solid fa-circle-question text-blue-600 mr-2"></i>Pertanyaan Sering Diajukan (FAQ)</h2>
+            <div class="max-w-3xl mx-auto space-y-4" id="faq-container">
+                <p class="text-center text-xs text-slate-500">Memuat FAQ...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Standar Instansi Pemerintah Modern & Dinamis -->
+    <footer class="bg-slate-950 text-slate-300 text-xs sm:text-sm border-t border-slate-800/80 pt-16 pb-8 relative overflow-hidden">
+        <div class="max-w-screen-xl mx-auto px-6 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-slate-800/80">
+                
+                <!-- Kolom 1: Profil Instansi & Legalitas -->
+                <div class="md:col-span-5 space-y-4">
+                    <div class="flex items-center gap-x-3">
+                        <img src="/logo.jpg" alt="Logo E-Ladinin" class="h-10 w-auto object-contain rounded-lg shadow-md" />
+                        <div>
+                            <span class="text-white font-extrabold text-xl tracking-tight block">E-LADININ</span>
+                            <span class="text-[10px] text-blue-400 font-semibold tracking-wider uppercase">Portal Resmi Pelayanan Publik</span>
+                        </div>
+                    </div>
+                    <p id="fDeskripsi" class="text-slate-400 leading-relaxed text-xs max-w-md">
+                        Memuat deskripsi instansi...
+                    </p>
+                    <div class="pt-2 flex items-center gap-x-2 text-[11px] text-emerald-400 font-semibold">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Terintegrasi Sistem Pemerintahan Berbasis Elektronik (SPBE)</span>
+                    </div>
+                </div>
+
+                <!-- Kolom 2: Kontak & Jam Operasional -->
+                <div class="md:col-span-4 space-y-3">
+                    <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-4 border-l-2 border-blue-600 pl-2.5">Kontak & Layanan</h4>
+                    <ul class="space-y-2.5 text-xs text-slate-300">
+                        <li class="flex items-start gap-x-3">
+                            <i class="fa-solid fa-location-dot text-blue-400 mt-0.5 shrink-0"></i>
+                            <span id="fAlamat">Memuat alamat...</span>
+                        </li>
+                        <li class="flex items-center gap-x-3">
+                            <i class="fa-solid fa-envelope text-blue-400 shrink-0"></i>
+                            <a id="fEmail" href="#" class="hover:text-blue-300 transition-colors">...</a>
+                        </li>
+                        <li class="flex items-center gap-x-3">
+                            <i class="fa-solid fa-phone text-blue-400 shrink-0"></i>
+                            <span id="fTelepon">...</span>
+                        </li>
+                        <li class="flex items-center gap-x-3 pt-1">
+                            <i class="fa-regular fa-clock text-emerald-400 shrink-0"></i>
+                            <span id="fJamKerja" class="bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800 text-emerald-300 font-mono text-[11px]">...</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Kolom 3: Media Sosial Resmi -->
+                <div class="md:col-span-3 space-y-4">
+                    <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-4 border-l-2 border-blue-600 pl-2.5">Media Sosial Resmi</h4>
+                    <p class="text-xs text-slate-400">Ikuti kanal informasi resmi Dinas Pendidikan untuk kabar dan pengumuman terbaru:</p>
+                    <div class="flex gap-2.5 pt-1">
+                        <a id="fInstagram" href="#" target="_blank" class="w-9 h-9 bg-slate-900 hover:bg-pink-600 text-slate-300 hover:text-white rounded-xl flex items-center justify-center border border-slate-800 transition-all shadow-sm">
+                            <i class="fa-brands fa-instagram text-base"></i>
+                        </a>
+                        <a id="fTiktok" href="#" target="_blank" class="w-9 h-9 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl flex items-center justify-center border border-slate-800 transition-all shadow-sm">
+                            <i class="fa-brands fa-tiktok text-base"></i>
+                        </a>
+                        <a id="fFacebook" href="#" target="_blank" class="w-9 h-9 bg-slate-900 hover:bg-blue-600 text-slate-300 hover:text-white rounded-xl flex items-center justify-center border border-slate-800 transition-all shadow-sm">
+                            <i class="fa-brands fa-facebook-f text-base"></i>
+                        </a>
+                        <a id="fYoutube" href="#" target="_blank" class="w-9 h-9 bg-slate-900 hover:bg-red-600 text-slate-300 hover:text-white rounded-xl flex items-center justify-center border border-slate-800 transition-all shadow-sm">
+                            <i class="fa-brands fa-youtube text-base"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Copyright & Atribusi Pengembang -->
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-y-3 text-xs text-slate-500">
+                <p id="fCopyright">© 2026 E-Ladinin v3.0. Dinas Pendidikan Kabupaten Bangkalan.</p>
+                <p id="fPengembang" class="font-mono text-[11px] bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 text-slate-400">
+                    Created by TIM IT Sekretariat Disdik
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Modal -->
+    <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-x-2">
+                    <i class="fa-solid fa-user-shield text-blue-700"></i>
+                    <h3 class="text-lg font-bold text-slate-900">Panel Admin Layanan</h3>
+                </div>
+                <button onclick="hideAdminModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+            
+            <div id="loginForm">
+                <input type="password" id="adminPassword" placeholder="Masukkan Password Admin" class="w-full border border-slate-300 rounded-xl px-4 py-2.5 mb-4 text-sm focus:ring-2 focus:ring-blue-600">
+                <button id="btnLogin" onclick="checkAdminPassword()" class="w-full py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-semibold text-sm rounded-xl">Masuk Mode Admin</button>
+            </div>
+            
+            <div id="adminPanel" class="hidden">
+                <div class="space-y-3 text-xs">
+                    <input type="text" id="newJudul" class="w-full border p-2.5 rounded-xl" placeholder="Judul Layanan">
+                    <textarea id="newDeskripsi" class="w-full border p-2.5 rounded-xl" placeholder="Deskripsi Singkat"></textarea>
+                    <input type="text" id="newLink" class="w-full border p-2.5 rounded-xl" placeholder="Link URL Tujuan">
+                    <input type="text" id="newKategori" class="w-full border p-2.5 rounded-xl" placeholder="Kategori (misal: Kepegawaian)">
+                    <input type="text" id="newIcon" class="w-full border p-2.5 rounded-xl" value="fa-solid fa-gear" placeholder="Icon Class (FontAwesome)">
+                </div>
+                <button id="btnAddService" onclick="addServiceFromAdmin()" class="mt-4 w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-xl">+ Tambahkan Layanan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logika & Rendering -->
+    <script>
+        let allServices = [];
+
+        function updateClock() {
+            const now = new Date();
+            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' };
+            const timeString = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta' });
+            document.getElementById('realtimeClock').innerText = `${now.toLocaleDateString('id-ID', dateOptions)} - ${timeString} WIB`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/data');
+                const data = await res.json();
+                
+                document.getElementById('visitCountDisplay').innerText = data.visitCount.toLocaleString('id-ID');
+
+                // Render Announcement jika ada
+                if (data.announcement) {
+                    document.getElementById('announcementText').innerText = data.announcement.pesan;
+                    document.getElementById('announcementBar').classList.remove('hidden');
+                }
+
+                // Render SKM Futuristis
+                if (data.skm) {
+                    const s = data.skm;
+                    if (s.nilai) document.getElementById('skmNilai').innerText = s.nilai;
+                    if (s.periode) document.getElementById('skmPeriode').innerText = `Periode: ${s.periode}`;
+                    if (s.mutu) document.getElementById('skmMutu').innerText = `MUTU ${s.mutu}`;
+                    if (s.kinerja) document.getElementById('skmKinerja').innerText = s.kinerja;
+                    if (s.catatan) document.getElementById('skmCatatan').innerText = s.catatan;
+                }
+
+                // Render FAQ
+                const faqContainer = document.getElementById('faq-container');
+                if (data.faqs && data.faqs.length > 0) {
+                    faqContainer.innerHTML = '';
+                    data.faqs.forEach(f => {
+                        faqContainer.innerHTML += `
+                            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                                <h4 class="font-bold text-slate-800 text-sm mb-1">Q: ${f.pertanyaan}</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">${f.jawaban}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    document.getElementById('faq').classList.add('hidden');
+                }
+
+                // Render Footer
+                if (data.footer) {
+                    const f = data.footer;
+                    if (f.deskripsi) document.getElementById('fDeskripsi').innerText = f.deskripsi;
+                    if (f.alamat) document.getElementById('fAlamat').innerText = f.alamat;
+                    if (f.email) {
+                        document.getElementById('fEmail').innerText = f.email;
+                        document.getElementById('fEmail').href = `mailto:${f.email}`;
+                    }
+                    if (f.telepon) document.getElementById('fTelepon').innerText = f.telepon;
+                    if (f.jam_kerja) document.getElementById('fJamKerja').innerText = f.jam_kerja;
+                    if (f.instagram) document.getElementById('fInstagram').href = f.instagram;
+                    if (f.tiktok) document.getElementById('fTiktok').href = f.tiktok;
+                    if (f.facebook) document.getElementById('fFacebook').href = f.facebook;
+                    if (f.youtube) document.getElementById('fYoutube').href = f.youtube;
+                    if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
+                    if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
+                }
+
+                allServices = data.services;
+                populateCategories(allServices);
+                renderServices(allServices);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('services-grid').innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-semibold">Gagal memuat data dari server.</div>';
+            }
+        }
+
+        function populateCategories(services) {
+            const categories = ['ALL', ...new Set(services.map(s => s.kategori))];
+            const select = document.getElementById('categoryFilter');
+            select.innerHTML = '';
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat}">${cat === 'ALL' ? 'Semua Kategori' : cat}</option>`;
+            });
+        }
+
+        function renderServices(services) {
+            const grid = document.getElementById('services-grid');
+            grid.innerHTML = '';
+
+            if (services.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400">Tidak ada layanan yang sesuai.</div>';
+                return;
+            }
+
+            services.forEach(s => {
+                const isOnline = s.status === 'ONLINE';
+                const statusBadge = isOnline 
+                    ? `<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Buka</span>`
+                    : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Maintenance</span>`;
+
+                grid.innerHTML += `
+                    <div class="card-3d rounded-2xl p-7 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-5">
+                                <div class="w-12 h-12 icon-box-3d text-blue-700 rounded-2xl flex items-center justify-center">
+                                    <i class="${s.icon} text-xl"></i>
+                                </div>
+                                <div class="flex items-center gap-x-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">${s.kategori}</span>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            <h3 class="font-extrabold text-xl text-slate-900 mb-2.5 leading-snug">${s.judul}</h3>
+                            <p class="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">${s.deskripsi}</p>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-slate-100">
+                            <a href="${isOnline ? s.link : '#'}" ${isOnline ? 'target="_blank"' : ''}
+                               class="inline-flex items-center gap-x-2 text-xs font-bold ${isOnline ? 'text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20' : 'text-slate-400 bg-slate-200 cursor-not-allowed'} px-5 py-3 rounded-xl transition-all w-full justify-center">
+                                <span>${isOnline ? 'Akses Layanan' : 'Layanan Ditutup Sementara'}</span>
+                                ${isOnline ? '<i class="fa-solid fa-arrow-right text-[10px]"></i>' : ''}
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterServices() {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCategory = document.getElementById('categoryFilter').value;
+
+            const filtered = allServices.filter(s => {
+                const matchSearch = s.judul.toLowerCase().includes(searchValue) || s.deskripsi.toLowerCase().includes(searchValue);
+                const matchCategory = selectedCategory === 'ALL' || s.kategori === selectedCategory;
+                return matchSearch && matchCategory;
+            });
+
+            renderServices(filtered);
+        }
+
+        function showAdminModal() { document.getElementById('adminModal').classList.remove('hidden'); }
+        function hideAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+        async function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            const res = await fetch('/api/check-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else { alert("Password salah!"); }
+        }
+
+        async function addServiceFromAdmin() {
+            const judul = document.getElementById('newJudul').value;
+            const deskripsi = document.getElementById('newDeskripsi').value;
+            const link = document.getElementById('newLink').value;
+            const kategori = document.getElementById('newKategori').value || "Umum";
+            const icon = document.getElementById('newIcon').value || "fa-solid fa-gear";
+
+            const res = await fetch('/api/add-service', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ judul, deskripsi, link, icon, kategori }) });
+            const data = await res.json();
+            alert(data.message);
+            hideAdminModal();
+            loadData();
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
