@@ -57,6 +57,16 @@
         .animate-marquee:hover {
             animation-play-state: paused;
         }
+
+        /* Animasi Melayang untuk Karakter Maskot GIF */
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .animate-floating-mascot {
+            animation: floatAnim 4s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased flex flex-col min-h-screen">
@@ -149,7 +159,7 @@
 
             <div class="max-w-3xl">
                 <span class="inline-block px-3.5 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold rounded-lg mb-4 tracking-wider uppercase backdrop-blur-md">
-                    E-Ladinin
+                    Elektronik Layanan Dinas Pendidikan
                 </span>
                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-6 text-white drop-shadow-md">
                     Elektronik Layanan Dinas Pendidikan
@@ -321,6 +331,21 @@
             </div>
         </div>
     </footer>
+
+    <!-- Widget Mascot Floating GIF di Pojok Kanan Bawah -->
+    <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end group pointer-events-auto">
+        <!-- Bubble Tooltip Menyapa -->
+        <div class="bg-slate-900/90 text-white text-[11px] font-medium px-3 py-1.5 rounded-xl shadow-xl border border-blue-500/30 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 backdrop-blur-md flex items-center gap-1.5 pointer-events-none">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Ada yang bisa kami bantu?</span>
+        </div>
+
+        <!-- Gambar GIF Karakter Melayang -->
+        <a href="#faq" title="Layanan Bantuan" class="animate-floating-mascot transition-transform hover:scale-110 active:scale-95 block">
+            <img src="/maskot.gif" alt="Maskot E-Ladinin" 
+                 class="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-[0_10px_15px_rgba(30,58,138,0.35)] cursor-pointer" />
+        </a>
+    </div>
 
     <!-- Admin Modal -->
     <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
