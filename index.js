@@ -27,12 +27,9 @@ const getSheetsClient = async () => {
     return google.sheets({ version: 'v4', auth: client });
 };
 
-let visitCount = 1420;
-
-// API Utama: Membaca Layanan, Pengumuman, FAQ, SKM, dan Footer
+// API Utama: Membaca Layanan, Pengumuman, FAQ, SKM, Footer, dan Hitung Pengunjung Persisten
 app.get('/api/data', async (req, res) => {
     try {
-        visitCount++;
         const sheets = await getSheetsClient();
         const spreadsheetId = process.env.SPREADSHEET_ID;
 
@@ -57,7 +54,9 @@ app.get('/api/data', async (req, res) => {
                     });
                 }
             }
-        } catch (e) { console.error("Error Sheet Layanan:", e.message); }
+        } catch (e) { 
+            console.error("Error Sheet Layanan:", e.message); 
+        }
 
         // 2. Ambil data dari sheet 'Pengumuman'
         let announcement = null;
@@ -70,7 +69,9 @@ app.get('/api/data', async (req, res) => {
             if (aRow && aRow[0] === 'AKTIF') {
                 announcement = { pesan: aRow[1], tipe: aRow[2] || 'info' };
             }
-        } catch (e) { /* Gunakan null jika sheet belum ada */ }
+        } catch (e) { 
+            /* Gunakan null jika sheet belum ada */ 
+        }
 
         // 3. Ambil data dari sheet 'FAQ'
         let faqs = [];
@@ -85,7 +86,9 @@ app.get('/api/data', async (req, res) => {
                     faqs.push({ pertanyaan: fRows[i][0], jawaban: fRows[i][1] });
                 }
             }
-        } catch (e) { /* Gunakan array kosong jika sheet belum ada */ }
+        } catch (e) { 
+            /* Gunakan array kosong jika sheet belum ada */ 
+        }
 
         // 4. Ambil data dari sheet 'SKM'
         let skm = {
@@ -100,10 +103,9 @@ app.get('/api/data', async (req, res) => {
                 spreadsheetId,
                 range: 'SKM!A1:E5',
             });
-            const rows = resSKM.data.values || [];
-            if (rows.length >= 2) {
-                // Baris ke-2 (indeks 1) berisi data SKM
-                const sRow = rows[1];
+            const rowsSKM = resSKM.data.values || [];
+            if (rowsSKM.length >= 2) {
+                const sRow = rowsSKM[1]; // Baris ke-2 (indeks 1)
                 skm = {
                     periode: sRow[0] || "Triwulan III - 2026",
                     nilai: sRow[1] || "88.75",
@@ -112,11 +114,11 @@ app.get('/api/data', async (req, res) => {
                     catatan: sRow[4] || "Berdasarkan hasil survei responden pengguna layanan digital Dinas Pendidikan Kabupaten Bangkalan."
                 };
             }
-        } catch (e) {
-            console.log("Sheet SKM belum dibuat atau error:", e.message);
+        } catch (e) { 
+            console.error("Error Sheet SKM:", e.message); 
         }
 
-        // 5. Ambil data dari sheet 'Footer'
+        // 5. Ambil data dari sheet 'Footer' & Hitung Pengunjung Persisten
         let footer = {
             deskripsi: "Sistem Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan. Mewujudkan tata kelola pelayanan publik yang efektif, efisien, transparan, dan akuntabel.",
             alamat: "Jl. Soekarno Hatta No. 23, Bangkalan - Madura",
@@ -131,23 +133,45 @@ app.get('/api/data', async (req, res) => {
             pengembang: "Created by TIM IT Sekretariat Disdik"
         };
 
+        let currentVisitCount = 1434;
+        let visitRowIndex = null;
+
         try {
             const resFooter = await sheets.spreadsheets.values.get({
                 spreadsheetId,
                 range: 'Footer!A:B',
             });
             const ftRows = resFooter.data.values || [];
-            ftRows.forEach(row => {
+            ftRows.forEach((row, index) => {
                 if (row[0] && row[1]) {
                     const key = row[0].toLowerCase().trim();
-                    if (footer.hasOwnProperty(key)) {
+                    if (key === 'visit_count') {
+                        currentVisitCount = parseInt(row[1], 10) || 1434;
+                        visitRowIndex = index + 1; // Menyimpan baris lokasi visit_count
+                    } else if (footer.hasOwnProperty(key)) {
                         footer[key] = row[1];
                     }
                 }
             });
-        } catch (e) { /* Gunakan nilai default jika sheet belum ada */ }
 
-        res.json({ services, announcement, faqs, skm, footer, visitCount });
+            // Tambahkan 1 hitungan pengunjung baru
+            currentVisitCount += 1;
+
+            // Jika baris visit_count ditemukan di sheet 'Footer', update nilainya
+            if (visitRowIndex) {
+                sheets.spreadsheets.values.update({
+                    spreadsheetId,
+                    range: `Footer!B${visitRowIndex}`,
+                    valueInputOption: 'USER_ENTERED',
+                    requestBody: { values: [[currentVisitCount]] }
+                }).catch(err => console.error("Gagal update visit_count di Sheets:", err.message));
+            }
+
+        } catch (e) { 
+            console.error("Error Sheet Footer/Counter:", e.message); 
+        }
+
+        res.json({ services, announcement, faqs, skm, footer, visitCount: currentVisitCount });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
