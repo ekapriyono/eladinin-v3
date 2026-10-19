@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Ladinin v3.0 • Portal Layanan Digital Dinas Pendidikan</title>
+    <title>E-Ladinin v3.0 • Elektronik Layanan Dinas Pendidikan</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -41,18 +41,46 @@
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.25), inset 0 2px 3px 0 rgba(255, 255, 255, 0.8);
         }
+
+        /* Animasi Running Text (Teks Berjalan) */
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee 25s linear infinite;
+        }
+
+        .animate-marquee:hover {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased flex flex-col min-h-screen">
 
-    <!-- Live Announcement Banner -->
-    <div id="announcementBar" class="hidden bg-amber-500 text-white text-xs font-semibold py-2.5 px-6 shadow-md border-b border-amber-600/40">
-        <div class="max-w-screen-xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-x-2">
-                <i class="fa-solid fa-bullhorn animate-bounce text-sm"></i>
-                <span id="announcementText">PENGUMUMAN: ...</span>
+    <!-- Live Announcement Running Text (Dinamis dari Spreadsheet) -->
+    <div id="announcementBar" class="hidden bg-amber-500 text-white text-xs font-semibold py-2 px-4 shadow-md border-b border-amber-600/40 relative z-50">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between gap-x-4 overflow-hidden">
+            <!-- Label Tetap Kiri -->
+            <div class="flex items-center gap-x-2 bg-amber-600/90 px-3 py-1 rounded-lg text-white shrink-0 z-10 shadow-sm">
+                <i class="fa-solid fa-bullhorn animate-bounce text-xs"></i>
+                <span class="font-bold tracking-wider uppercase text-[10px]">PENGUMUMAN</span>
             </div>
-            <button onclick="document.getElementById('announcementBar').remove()" class="text-white/80 hover:text-white">&times;</button>
+
+            <!-- Area Running Text -->
+            <div class="overflow-hidden whitespace-nowrap w-full relative">
+                <div id="announcementText" class="animate-marquee font-medium tracking-wide">
+                    Memuat pengumuman...
+                </div>
+            </div>
+
+            <!-- Tombol Tutup Banner -->
+            <button onclick="document.getElementById('announcementBar').remove()" class="text-white/80 hover:text-white shrink-0 z-10 bg-amber-600/50 hover:bg-amber-700 w-6 h-6 rounded-full flex items-center justify-center transition-colors">
+                &times;
+            </button>
         </div>
     </div>
 
@@ -64,7 +92,7 @@
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span>Portal Layanan Publik Resmi Dinas Pendidikan Kabupaten Bangkalan</span>
+                <span>Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan</span>
             </div>
             <div class="hidden sm:flex items-center gap-x-6 text-slate-400">
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
@@ -121,7 +149,7 @@
 
             <div class="max-w-3xl">
                 <span class="inline-block px-3.5 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold rounded-lg mb-4 tracking-wider uppercase backdrop-blur-md">
-                    E-LADININ
+                    E-Ladinin
                 </span>
                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-6 text-white drop-shadow-md">
                     Elektronik Layanan Dinas Pendidikan
