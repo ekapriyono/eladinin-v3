@@ -96,7 +96,7 @@
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
                 
                 <!-- LINK LAYANAN PENGADUAN DINAMIS -->
-                <a id="topPengaduanLink" href="javascript:void(0)" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
+                <a id="topPengaduanLink" href="https://script.google.com/macros/s/AKfycbzqaeBxC6xd7fEJN917as1p_0WURhTDPXhtjHYElwGZgtNCVAELQD4DuzH_htpUKZfnSg/exec" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
                     <i class="fa-solid fa-headset text-amber-400 mr-1"></i> Layanan Pengaduan
                 </a>
             </div>
@@ -124,7 +124,7 @@
                 <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
                 
                 <!-- MENU MEKANISME LAYANAN DINAMIS -->
-                <a id="navMekanismeLink" href="javascript:void(0)" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
+                <a id="navMekanismeLink" href="https://drive.google.com/file/d/1gL7SIV7xwhkDKs0YOrVW0KWCbnO1xqcL/view?usp=sharing" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
                     <i class="fa-solid fa-diagram-project text-blue-600 text-xs"></i>
                     <span>Mekanisme Layanan</span>
                 </a>
@@ -381,7 +381,9 @@
                 const res = await fetch('/api/data');
                 const data = await res.json();
                 
-                document.getElementById('visitCountDisplay').innerText = data.visitCount.toLocaleString('id-ID');
+                if (data.visitCount) {
+                    document.getElementById('visitCountDisplay').innerText = data.visitCount.toLocaleString('id-ID');
+                }
 
                 if (data.announcement) {
                     document.getElementById('announcementText').innerText = data.announcement.pesan;
@@ -429,48 +431,28 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // CARI SEMUA KUNCI YANG DIPERKIRAKAN UNTUK MEKANISME
-                    let urlMek = f['link_mekanisme'] || f['linkmekanisme'] || f['link_mekanisme_layanan'];
-                    // JIKA TIDAK KETEMU, CARI KUNCI SPREADSHEET YANG MENGANDUNG KATA 'MEKANISME'
-                    if (!urlMek) {
-                        Object.keys(f).forEach(k => {
-                            if (k.includes('mekanisme')) urlMek = f[k];
-                        });
-                    }
-
-                    if (urlMek && urlMek.startsWith('http')) {
+                    // PENANGANAN DIRECT LINK DINAMIS
+                    const linkMek = f.link_mekanisme || f.linkmekanisme;
+                    if (linkMek && linkMek.length > 5) {
                         const elMek = document.getElementById('navMekanismeLink');
-                        if (elMek) {
-                            elMek.href = urlMek.trim();
-                            elMek.target = "_blank";
-                        }
+                        if (elMek) elMek.href = linkMek;
                     }
 
-                    // CARI SEMUA KUNCI YANG DIPERKIRAKAN UNTUK PENGADUAN
-                    let urlPeng = f['link_pengaduan'] || f['linkpengaduan'] || f['link_layanan_pengaduan'];
-                    // JIKA TIDAK KETEMU, CARI KUNCI SPREADSHEET YANG MENGANDUNG KATA 'PENGADUAN'
-                    if (!urlPeng) {
-                        Object.keys(f).forEach(k => {
-                            if (k.includes('pengaduan')) urlPeng = f[k];
-                        });
-                    }
-
-                    if (urlPeng && urlPeng.startsWith('http')) {
+                    const linkPeng = f.link_pengaduan || f.linkpengaduan;
+                    if (linkPeng && linkPeng.length > 5) {
                         const elPeng = document.getElementById('topPengaduanLink');
-                        if (elPeng) {
-                            elPeng.href = urlPeng.trim();
-                            elPeng.target = "_blank";
-                        }
+                        if (elPeng) elPeng.href = linkPeng;
                     }
                 }
 
-                allServices = data.services;
-                populateCategories(allServices);
-                renderServices(allServices);
+                if (data.services) {
+                    allServices = data.services;
+                    populateCategories(allServices);
+                    renderServices(allServices);
+                }
 
             } catch (err) {
-                console.error(err);
-                document.getElementById('services-grid').innerHTML = '<div class="col-span-full text-center py-10 text-red-500 font-semibold">Gagal memuat data dari server.</div>';
+                console.error("Error loading data:", err);
             }
         }
 
