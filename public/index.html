@@ -95,7 +95,7 @@
             <div class="hidden sm:flex items-center gap-x-6 text-slate-400">
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
                 
-                <!-- LINK LAYANAN PENGADUAN DINAMIS DARI SPREADSHEET -->
+                <!-- LINK LAYANAN PENGADUAN DINAMIS -->
                 <a id="topPengaduanLink" href="#" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
                     <i class="fa-solid fa-headset text-amber-400 mr-1"></i> Layanan Pengaduan
                 </a>
@@ -123,7 +123,7 @@
                 <a href="#layanan" class="text-blue-700 font-bold">Daftar Layanan</a>
                 <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
                 
-                <!-- MENU MEKANISME LAYANAN DINAMIS DARI SPREADSHEET -->
+                <!-- MENU MEKANISME LAYANAN DINAMIS -->
                 <a id="navMekanismeLink" href="#" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
                     <i class="fa-solid fa-diagram-project text-blue-600 text-xs"></i>
                     <span>Mekanisme Layanan</span>
@@ -429,7 +429,7 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // Tautkan Direct Link Mekanisme & Pengaduan
+                    // Sambungkan Direct Link Mekanisme & Pengaduan
                     if (f.link_mekanisme && f.link_mekanisme !== '#') {
                         document.getElementById('navMekanismeLink').href = f.link_mekanisme;
                     }
