@@ -9,12 +9,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rute Utama: Menampilkan index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Autentikasi Google Sheets API via Service Account
 const getSheetsClient = async () => {
     const auth = new google.auth.GoogleAuth({
         credentials: {
@@ -27,13 +25,18 @@ const getSheetsClient = async () => {
     return google.sheets({ version: 'v4', auth: client });
 };
 
-// API Utama: Membaca Layanan, Pengumuman, FAQ, SKM, Footer, dan Hitung Pengunjung Persisten
+// API Utama: Membaca Data Spreadsheet Realtime (Tanpa Cache)
 app.get('/api/data', async (req, res) => {
+    // Matikan Cache di Vercel/Browser agar update link di Google Sheet langsung berubah saat itu juga
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
     try {
         const sheets = await getSheetsClient();
         const spreadsheetId = process.env.SPREADSHEET_ID;
 
-        // 1. Ambil data dari sheet 'Layanan'
+        // 1. Sheet Layanan
         let services = [];
         try {
             const resServices = await sheets.spreadsheets.values.get({
@@ -58,7 +61,7 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet Layanan:", e.message); 
         }
 
-        // 2. Ambil data dari sheet 'Pengumuman'
+        // 2. Sheet Pengumuman
         let announcement = null;
         try {
             const resAnnounce = await sheets.spreadsheets.values.get({
@@ -69,11 +72,9 @@ app.get('/api/data', async (req, res) => {
             if (aRow && aRow[0] === 'AKTIF') {
                 announcement = { pesan: aRow[1], tipe: aRow[2] || 'info' };
             }
-        } catch (e) { 
-            /* Gunakan null jika sheet belum ada */ 
-        }
+        } catch (e) {}
 
-        // 3. Ambil data dari sheet 'FAQ'
+        // 3. Sheet FAQ
         let faqs = [];
         try {
             const resFaq = await sheets.spreadsheets.values.get({
@@ -86,11 +87,9 @@ app.get('/api/data', async (req, res) => {
                     faqs.push({ pertanyaan: fRows[i][0], jawaban: fRows[i][1] });
                 }
             }
-        } catch (e) { 
-            /* Gunakan array kosong jika sheet belum ada */ 
-        }
+        } catch (e) {}
 
-        // 4. Ambil data dari sheet 'SKM'
+        // 4. Sheet SKM
         let skm = {
             periode: "Triwulan III - 2026",
             nilai: "88.75",
@@ -105,7 +104,7 @@ app.get('/api/data', async (req, res) => {
             });
             const rowsSKM = resSKM.data.values || [];
             if (rowsSKM.length >= 2) {
-                const sRow = rowsSKM[1]; // Baris ke-2 (indeks 1)
+                const sRow = rowsSKM[1];
                 skm = {
                     periode: sRow[0] || "Triwulan III - 2026",
                     nilai: sRow[1] || "88.75",
@@ -118,9 +117,9 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet SKM:", e.message); 
         }
 
-        // 5. Ambil data dari sheet 'Footer' & Hitung Pengunjung Persisten
+        // 5. Sheet Footer & Counter Pengunjung
         let footer = {
-            deskripsi: "Sistem Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan. Mewujudkan tata kelola pelayanan publik yang efektif, efisien, transparan, dan akuntabel.",
+            deskripsi: "Sistem Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan.",
             alamat: "Jl. Soekarno Hatta No. 23, Bangkalan - Madura",
             email: "disdik.bklkab@gmail.com",
             telepon: "+62 852-3613-7770",
@@ -130,41 +129,43 @@ app.get('/api/data', async (req, res) => {
             facebook: "#",
             youtube: "#",
             copyright: "© 2026 E-Ladinin v3.0. Dinas Pendidikan Kabupaten Bangkalan.",
-            pengembang: "Created by TIM IT Sekretariat Disdik"
+            pengembang: "Created by TIM IT Sekretariat Disdik",
+            link_mekanisme: "#",
+            link_pengaduan: "#"
         };
 
-        let currentVisitCount = 1434;
+        let currentVisitCount = 6911;
         let visitRowIndex = null;
 
         try {
             const resFooter = await sheets.spreadsheets.values.get({
                 spreadsheetId,
-                range: 'Footer!A:B',
+                range: 'Footer!A1:B50',
             });
             const ftRows = resFooter.data.values || [];
             ftRows.forEach((row, index) => {
                 if (row[0] && row[1]) {
-                    const key = row[0].toLowerCase().trim();
+                    const key = row[0].toString().toLowerCase().trim().replace(/\s+/g, '_');
+                    const val = row[1].toString().trim();
+
                     if (key === 'visit_count') {
-                        currentVisitCount = parseInt(row[1], 10) || 1434;
-                        visitRowIndex = index + 1; // Menyimpan baris lokasi visit_count
-                    } else if (footer.hasOwnProperty(key)) {
-                        footer[key] = row[1];
+                        currentVisitCount = parseInt(val, 10) || 6911;
+                        visitRowIndex = index + 1;
+                    } else {
+                        footer[key] = val;
                     }
                 }
             });
 
-            // Tambahkan 1 hitungan pengunjung baru
             currentVisitCount += 1;
 
-            // Jika baris visit_count ditemukan di sheet 'Footer', update nilainya
             if (visitRowIndex) {
                 sheets.spreadsheets.values.update({
                     spreadsheetId,
                     range: `Footer!B${visitRowIndex}`,
                     valueInputOption: 'USER_ENTERED',
                     requestBody: { values: [[currentVisitCount]] }
-                }).catch(err => console.error("Gagal update visit_count di Sheets:", err.message));
+                }).catch(err => console.error("Gagal update visit_count:", err.message));
             }
 
         } catch (e) { 
@@ -177,7 +178,6 @@ app.get('/api/data', async (req, res) => {
     }
 });
 
-// API: Tambah Layanan Baru dari Modal Admin
 app.post('/api/add-service', async (req, res) => {
     try {
         const { judul, deskripsi, link, icon, kategori } = req.body;
@@ -205,7 +205,6 @@ app.post('/api/add-service', async (req, res) => {
     }
 });
 
-// API: Cek Password Admin
 app.post('/api/check-password', (req, res) => {
     const { password } = req.body;
     const SECRET_PASSWORD = process.env.ADMIN_PASSWORD || "admin2026";

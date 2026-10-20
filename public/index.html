@@ -95,8 +95,8 @@
             <div class="hidden sm:flex items-center gap-x-6 text-slate-400">
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
                 
-                <!-- LINK LAYANAN PENGADUAN DINAMIS -->
-                <a id="topPengaduanLink" href="https://script.google.com/macros/s/AKfycbzqaeBxC6xd7fEJN917as1p_0WURhTDPXhtjHYElwGZgtNCVAELQD4DuzH_htpUKZfnSg/exec" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
+                <!-- LINK LAYANAN PENGADUAN DINAMIS MURNI DARI GOOGLE SHEET -->
+                <a id="topPengaduanLink" href="#" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
                     <i class="fa-solid fa-headset text-amber-400 mr-1"></i> Layanan Pengaduan
                 </a>
             </div>
@@ -123,8 +123,8 @@
                 <a href="#layanan" class="text-blue-700 font-bold">Daftar Layanan</a>
                 <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
                 
-                <!-- MENU MEKANISME LAYANAN DINAMIS -->
-                <a id="navMekanismeLink" href="https://drive.google.com/file/d/1gL7SIV7xwhkDKs0YOrVW0KWCbnO1xqcL/view?usp=sharing" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
+                <!-- MENU MEKANISME LAYANAN DINAMIS MURNI DARI GOOGLE SHEET -->
+                <a id="navMekanismeLink" href="#" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
                     <i class="fa-solid fa-diagram-project text-blue-600 text-xs"></i>
                     <span>Mekanisme Layanan</span>
                 </a>
@@ -378,7 +378,8 @@
 
         async function loadData() {
             try {
-                const res = await fetch('/api/data');
+                // Tambahkan timestamp acak agar browser tidak menyimpan cache API
+                const res = await fetch('/api/data?t=' + new Date().getTime());
                 const data = await res.json();
                 
                 if (data.visitCount) {
@@ -431,17 +432,18 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // PENANGANAN DIRECT LINK DINAMIS
+                    // SYNC MEKANISME DENGAN LINK RECENT DI GOOGLE SHEET
                     const linkMek = f.link_mekanisme || f.linkmekanisme;
-                    if (linkMek && linkMek.length > 5) {
+                    if (linkMek && linkMek.trim() !== '' && linkMek !== '#') {
                         const elMek = document.getElementById('navMekanismeLink');
-                        if (elMek) elMek.href = linkMek;
+                        if (elMek) elMek.href = linkMek.trim();
                     }
 
+                    // SYNC PENGADUAN DENGAN LINK RECENT DI GOOGLE SHEET
                     const linkPeng = f.link_pengaduan || f.linkpengaduan;
-                    if (linkPeng && linkPeng.length > 5) {
+                    if (linkPeng && linkPeng.trim() !== '' && linkPeng !== '#') {
                         const elPeng = document.getElementById('topPengaduanLink');
-                        if (elPeng) elPeng.href = linkPeng;
+                        if (elPeng) elPeng.href = linkPeng.trim();
                     }
                 }
 
