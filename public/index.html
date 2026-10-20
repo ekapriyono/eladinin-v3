@@ -96,7 +96,7 @@
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
                 
                 <!-- LINK LAYANAN PENGADUAN DINAMIS -->
-                <a id="topPengaduanLink" href="#" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
+                <a id="topPengaduanLink" href="javascript:void(0)" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
                     <i class="fa-solid fa-headset text-amber-400 mr-1"></i> Layanan Pengaduan
                 </a>
             </div>
@@ -124,7 +124,7 @@
                 <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
                 
                 <!-- MENU MEKANISME LAYANAN DINAMIS -->
-                <a id="navMekanismeLink" href="#" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
+                <a id="navMekanismeLink" href="javascript:void(0)" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
                     <i class="fa-solid fa-diagram-project text-blue-600 text-xs"></i>
                     <span>Mekanisme Layanan</span>
                 </a>
@@ -429,12 +429,24 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // Sambungkan Direct Link Mekanisme & Pengaduan
-                    if (f.link_mekanisme && f.link_mekanisme !== '#') {
-                        document.getElementById('navMekanismeLink').href = f.link_mekanisme;
+                    // PENANGANAN PENCOCOKAN LINK MEKANISME DENGAN BERBAGAI KUNCI
+                    const urlMekanisme = f.link_mekanisme || f.linkmekanisme || f['link_mekanisme'];
+                    if (urlMekanisme && urlMekanisme.trim() !== '' && urlMekanisme !== '#') {
+                        const elMek = document.getElementById('navMekanismeLink');
+                        if (elMek) {
+                            elMek.href = urlMekanisme.trim();
+                            elMek.target = "_blank";
+                        }
                     }
-                    if (f.link_pengaduan && f.link_pengaduan !== '#') {
-                        document.getElementById('topPengaduanLink').href = f.link_pengaduan;
+
+                    // PENANGANAN PENCOCOKAN LINK PENGADUAN DENGAN BERBAGAI KUNCI
+                    const urlPengaduan = f.link_pengaduan || f.linkpengaduan || f['link_pengaduan'];
+                    if (urlPengaduan && urlPengaduan.trim() !== '' && urlPengaduan !== '#') {
+                        const elPeng = document.getElementById('topPengaduanLink');
+                        if (elPeng) {
+                            elPeng.href = urlPengaduan.trim();
+                            elPeng.target = "_blank";
+                        }
                     }
                 }
 
