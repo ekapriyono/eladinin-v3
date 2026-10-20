@@ -429,22 +429,36 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // PENANGANAN PENCOCOKAN LINK MEKANISME DENGAN BERBAGAI KUNCI
-                    const urlMekanisme = f.link_mekanisme || f.linkmekanisme || f['link_mekanisme'];
-                    if (urlMekanisme && urlMekanisme.trim() !== '' && urlMekanisme !== '#') {
+                    // CARI SEMUA KUNCI YANG DIPERKIRAKAN UNTUK MEKANISME
+                    let urlMek = f['link_mekanisme'] || f['linkmekanisme'] || f['link_mekanisme_layanan'];
+                    // JIKA TIDAK KETEMU, CARI KUNCI SPREADSHEET YANG MENGANDUNG KATA 'MEKANISME'
+                    if (!urlMek) {
+                        Object.keys(f).forEach(k => {
+                            if (k.includes('mekanisme')) urlMek = f[k];
+                        });
+                    }
+
+                    if (urlMek && urlMek.startsWith('http')) {
                         const elMek = document.getElementById('navMekanismeLink');
                         if (elMek) {
-                            elMek.href = urlMekanisme.trim();
+                            elMek.href = urlMek.trim();
                             elMek.target = "_blank";
                         }
                     }
 
-                    // PENANGANAN PENCOCOKAN LINK PENGADUAN DENGAN BERBAGAI KUNCI
-                    const urlPengaduan = f.link_pengaduan || f.linkpengaduan || f['link_pengaduan'];
-                    if (urlPengaduan && urlPengaduan.trim() !== '' && urlPengaduan !== '#') {
+                    // CARI SEMUA KUNCI YANG DIPERKIRAKAN UNTUK PENGADUAN
+                    let urlPeng = f['link_pengaduan'] || f['linkpengaduan'] || f['link_layanan_pengaduan'];
+                    // JIKA TIDAK KETEMU, CARI KUNCI SPREADSHEET YANG MENGANDUNG KATA 'PENGADUAN'
+                    if (!urlPeng) {
+                        Object.keys(f).forEach(k => {
+                            if (k.includes('pengaduan')) urlPeng = f[k];
+                        });
+                    }
+
+                    if (urlPeng && urlPeng.startsWith('http')) {
                         const elPeng = document.getElementById('topPengaduanLink');
                         if (elPeng) {
-                            elPeng.href = urlPengaduan.trim();
+                            elPeng.href = urlPeng.trim();
                             elPeng.target = "_blank";
                         }
                     }
