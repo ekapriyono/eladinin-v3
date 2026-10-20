@@ -37,11 +37,6 @@
             box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.2), 0 8px 16px -4px rgba(0, 0, 0, 0.3);
         }
 
-        .icon-box-3d {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.25), inset 0 2px 3px 0 rgba(255, 255, 255, 0.8);
-        }
-
         /* Animasi Running Text (Teks Berjalan) */
         @keyframes marquee {
             0% { transform: translateX(100%); }
@@ -102,7 +97,7 @@
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span>Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan</span>
+                <span>Elektronik Layanan Dinas Pendidikan</span>
             </div>
             <div class="hidden sm:flex items-center gap-x-6 text-slate-400">
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
@@ -159,7 +154,7 @@
 
             <div class="max-w-3xl">
                 <span class="inline-block px-3.5 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-bold rounded-lg mb-4 tracking-wider uppercase backdrop-blur-md">
-                    Elektronik Layanan Dinas Pendidikan
+                    E-Ladinin
                 </span>
                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-6 text-white drop-shadow-md">
                     Elektronik Layanan Dinas Pendidikan
@@ -326,7 +321,7 @@
             <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-y-3 text-xs text-slate-500">
                 <p id="fCopyright">© 2026 E-Ladinin v3.0. Dinas Pendidikan Kabupaten Bangkalan.</p>
                 <p id="fPengembang" class="font-mono text-[11px] bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 text-slate-400">
-                    Created by TIM IT Sekretariat Disdik
+                    Created by TIM IT E-LADININ Sekretariat Disdik
                 </p>
             </div>
         </div>
@@ -340,7 +335,7 @@
             <span>Ada yang bisa kami bantu?</span>
         </div>
 
-        <!-- Gambar GIF Karakter Melayang -->
+        <!-- Gambar GIF Karakter Melayang (Diperbesar) -->
         <a href="#faq" title="Layanan Bantuan" class="animate-floating-mascot transition-transform hover:scale-110 active:scale-95 block">
             <img src="/maskot.gif" alt="Maskot E-Ladinin" 
                  class="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-[0_10px_15px_rgba(30,58,138,0.35)] cursor-pointer" />
@@ -475,33 +470,73 @@
                 return;
             }
 
+            // Fungsi Penentu Warna Tema Berdasarkan Kategori
+            const getCategoryTheme = (kategori) => {
+                const cat = (kategori || '').toLowerCase();
+                if (cat.includes('pegawai') || cat.includes('sdm')) {
+                    return {
+                        badge: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
+                        iconBg: 'from-indigo-500 to-blue-600 shadow-indigo-500/30',
+                        accentGlow: 'hover:shadow-indigo-500/15 hover:border-indigo-400/60'
+                    };
+                } else if (cat.includes('siswa') || cat.includes('didik')) {
+                    return {
+                        badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+                        iconBg: 'from-emerald-500 to-teal-600 shadow-emerald-500/30',
+                        accentGlow: 'hover:shadow-emerald-500/15 hover:border-emerald-400/60'
+                    };
+                } else if (cat.includes('sarpras') || cat.includes('aset') || cat.includes('fasilitas')) {
+                    return {
+                        badge: 'bg-amber-50 text-amber-700 border-amber-200/80',
+                        iconBg: 'from-amber-500 to-orange-600 shadow-amber-500/30',
+                        accentGlow: 'hover:shadow-amber-500/15 hover:border-amber-400/60'
+                    };
+                } else if (cat.includes('keuangan') || cat.includes('bos')) {
+                    return {
+                        badge: 'bg-rose-50 text-rose-700 border-rose-200/80',
+                        iconBg: 'from-rose-500 to-pink-600 shadow-rose-500/30',
+                        accentGlow: 'hover:shadow-rose-500/15 hover:border-rose-400/60'
+                    };
+                }
+                return {
+                    badge: 'bg-blue-50 text-blue-700 border-blue-200/80',
+                    iconBg: 'from-blue-600 to-cyan-500 shadow-blue-500/30',
+                    accentGlow: 'hover:shadow-blue-500/15 hover:border-blue-400/60'
+                };
+            };
+
             services.forEach(s => {
                 const isOnline = s.status === 'ONLINE';
+                const theme = getCategoryTheme(s.kategori);
+
                 const statusBadge = isOnline 
-                    ? `<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-circle text-[8px] mr-1"></i>Buka</span>`
-                    : `<span class="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Maintenance</span>`;
+                    ? `<span class="inline-flex items-center gap-x-1.5 text-[10px] font-extrabold text-emerald-700 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>ONLINE</span>`
+                    : `<span class="inline-flex items-center gap-x-1.5 text-[10px] font-extrabold text-amber-700 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full shadow-sm"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i>MAINTENANCE</span>`;
 
                 grid.innerHTML += `
-                    <div class="card-3d rounded-2xl p-7 flex flex-col justify-between">
+                    <div class="card-3d bg-white/90 rounded-3xl p-7 flex flex-col justify-between border border-slate-200/80 backdrop-blur-md transition-all duration-300 relative group overflow-hidden ${theme.accentGlow}">
+                        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${theme.iconBg}"></div>
+
                         <div>
-                            <div class="flex items-center justify-between mb-5">
-                                <div class="w-12 h-12 icon-box-3d text-blue-700 rounded-2xl flex items-center justify-center">
-                                    <i class="${s.icon} text-xl"></i>
+                            <div class="flex items-center justify-between mb-6 pt-2">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${theme.iconBg} text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                                    <i class="${s.icon} text-2xl"></i>
                                 </div>
-                                <div class="flex items-center gap-x-2">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">${s.kategori}</span>
+                                <div class="flex flex-col items-end gap-y-1.5">
                                     ${statusBadge}
+                                    <span class="text-[10px] font-extrabold uppercase tracking-wider ${theme.badge} border px-2.5 py-0.5 rounded-lg shadow-2xs">${s.kategori}</span>
                                 </div>
                             </div>
-                            <h3 class="font-extrabold text-xl text-slate-900 mb-2.5 leading-snug">${s.judul}</h3>
-                            <p class="text-slate-600 text-sm leading-relaxed mb-6 line-clamp-3">${s.deskripsi}</p>
+
+                            <h3 class="font-extrabold text-xl text-slate-900 mb-3 leading-snug group-hover:text-blue-700 transition-colors">${s.judul}</h3>
+                            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed mb-6 line-clamp-3">${s.deskripsi}</p>
                         </div>
                         
-                        <div class="pt-4 border-t border-slate-100">
+                        <div class="pt-5 border-t border-slate-100">
                             <a href="${isOnline ? s.link : '#'}" ${isOnline ? 'target="_blank"' : ''}
-                               class="inline-flex items-center gap-x-2 text-xs font-bold ${isOnline ? 'text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20' : 'text-slate-400 bg-slate-200 cursor-not-allowed'} px-5 py-3 rounded-xl transition-all w-full justify-center">
-                                <span>${isOnline ? 'Akses Layanan' : 'Layanan Ditutup Sementara'}</span>
-                                ${isOnline ? '<i class="fa-solid fa-arrow-right text-[10px]"></i>' : ''}
+                               class="inline-flex items-center gap-x-2 text-xs font-bold ${isOnline ? 'text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/40' : 'text-slate-400 bg-slate-200/80 cursor-not-allowed'} px-5 py-3.5 rounded-2xl transition-all duration-300 w-full justify-center transform active:scale-98">
+                                <span>${isOnline ? 'Akses Layanan Sekarang' : 'Layanan Ditutup Sementara'}</span>
+                                ${isOnline ? '<i class="fa-solid fa-circle-arrow-right text-sm"></i>' : ''}
                             </a>
                         </div>
                     </div>
