@@ -27,7 +27,6 @@ const getSheetsClient = async () => {
 
 // API Utama: Membaca Data Spreadsheet Realtime (Tanpa Cache)
 app.get('/api/data', async (req, res) => {
-    // Matikan Cache di Vercel/Browser agar update link di Google Sheet langsung berubah saat itu juga
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
@@ -117,7 +116,28 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet SKM:", e.message); 
         }
 
-        // 5. Sheet Footer & Counter Pengunjung
+        // 5. Sheet Instagram Feed (4 Postingan Terbaru)
+        let instagramFeed = [];
+        try {
+            const resIg = await sheets.spreadsheets.values.get({
+                spreadsheetId,
+                range: 'Instagram!A2:C5',
+            });
+            const igRows = resIg.data.values || [];
+            igRows.forEach(row => {
+                if (row[0] || row[1]) {
+                    instagramFeed.push({
+                        judul: row[0] || 'Postingan Instagram Dinas Pendidikan',
+                        gambar: row[1] || 'https://via.placeholder.com/300',
+                        link: row[2] || 'https://instagram.com'
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Error Sheet Instagram:", e.message);
+        }
+
+        // 6. Sheet Footer & Counter Pengunjung
         let footer = {
             deskripsi: "Sistem Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan.",
             alamat: "Jl. Soekarno Hatta No. 23, Bangkalan - Madura",
@@ -172,7 +192,7 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet Footer/Counter:", e.message); 
         }
 
-        res.json({ services, announcement, faqs, skm, footer, visitCount: currentVisitCount });
+        res.json({ services, announcement, faqs, skm, instagramFeed, footer, visitCount: currentVisitCount });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

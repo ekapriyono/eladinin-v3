@@ -94,8 +94,6 @@
             </div>
             <div class="hidden sm:flex items-center gap-x-6 text-slate-400">
                 <span><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Terenkripsi & Aman</span>
-                
-                <!-- LINK LAYANAN PENGADUAN DINAMIS MURNI DARI GOOGLE SHEET -->
                 <a id="topPengaduanLink" href="#" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-x-1 font-semibold text-slate-300">
                     <i class="fa-solid fa-headset text-amber-400 mr-1"></i> Layanan Pengaduan
                 </a>
@@ -117,13 +115,10 @@
                 </div>
             </div>
             
-            <!-- MENU NAVBAR -->
             <div class="hidden md:flex items-center gap-x-8 text-sm font-semibold text-slate-600">
                 <a href="#" class="hover:text-blue-700 transition-colors">Beranda</a>
                 <a href="#layanan" class="text-blue-700 font-bold">Daftar Layanan</a>
                 <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
-                
-                <!-- MENU MEKANISME LAYANAN DINAMIS MURNI DARI GOOGLE SHEET -->
                 <a id="navMekanismeLink" href="#" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
                     <i class="fa-solid fa-diagram-project text-blue-600 text-xs"></i>
                     <span>Mekanisme Layanan</span>
@@ -244,6 +239,26 @@
             <h2 class="text-2xl font-bold text-slate-900 mb-8 text-center"><i class="fa-solid fa-circle-question text-blue-600 mr-2"></i>Pertanyaan Sering Diajukan (FAQ)</h2>
             <div class="max-w-3xl mx-auto space-y-4" id="faq-container">
                 <p class="text-center text-xs text-slate-500">Memuat FAQ...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: GALERI INSTAGRAM (4 POSTINGAN TERBARU) - POSISI DI ATAS FOOTER -->
+    <section class="max-w-screen-xl mx-auto px-6 my-16">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-extrabold border-l-4 border-pink-500 pl-3 flex items-center text-slate-900">
+                <i class="fa-brands fa-instagram text-pink-600 mr-2 text-2xl"></i> Galeri Instagram Disdik
+            </h3>
+            <a id="igProfileLink" href="https://instagram.com" target="_blank" class="text-xs font-semibold text-blue-600 hover:text-pink-600 transition flex items-center gap-x-1">
+                <span>Ikuti Instagram Kami</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+
+        <div id="instagram-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="col-span-full text-center py-8 text-slate-400 text-xs">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-pink-600"></i>
+                <p>Memuat galeri Instagram...</p>
             </div>
         </div>
     </section>
@@ -378,7 +393,6 @@
 
         async function loadData() {
             try {
-                // Tambahkan timestamp acak agar browser tidak menyimpan cache API
                 const res = await fetch('/api/data?t=' + new Date().getTime());
                 const data = await res.json();
                 
@@ -415,6 +429,24 @@
                     document.getElementById('faq').classList.add('hidden');
                 }
 
+                if (data.instagramFeed && data.instagramFeed.length > 0) {
+                    const igGrid = document.getElementById('instagram-grid');
+                    igGrid.innerHTML = '';
+                    data.instagramFeed.forEach(item => {
+                        igGrid.innerHTML += `
+                            <a href="${item.link}" target="_blank" class="card-3d rounded-2xl overflow-hidden relative group aspect-square block border border-slate-200/80 shadow-md">
+                                <img src="${item.gambar}" alt="${item.judul}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-4">
+                                    <p class="text-xs text-white font-medium line-clamp-2 leading-snug">${item.judul}</p>
+                                    <span class="text-[10px] text-pink-400 mt-2 flex items-center font-semibold">
+                                        <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Lihat Postingan
+                                    </span>
+                                </div>
+                            </a>
+                        `;
+                    });
+                }
+
                 if (data.footer) {
                     const f = data.footer;
                     if (f.deskripsi) document.getElementById('fDeskripsi').innerText = f.deskripsi;
@@ -425,21 +457,22 @@
                     }
                     if (f.telepon) document.getElementById('fTelepon').innerText = f.telepon;
                     if (f.jam_kerja) document.getElementById('fJamKerja').innerText = f.jam_kerja;
-                    if (f.instagram) document.getElementById('fInstagram').href = f.instagram;
+                    if (f.instagram) {
+                        document.getElementById('fInstagram').href = f.instagram;
+                        document.getElementById('igProfileLink').href = f.instagram;
+                    }
                     if (f.tiktok) document.getElementById('fTiktok').href = f.tiktok;
                     if (f.facebook) document.getElementById('fFacebook').href = f.facebook;
                     if (f.youtube) document.getElementById('fYoutube').href = f.youtube;
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // SYNC MEKANISME DENGAN LINK RECENT DI GOOGLE SHEET
                     const linkMek = f.link_mekanisme || f.linkmekanisme;
                     if (linkMek && linkMek.trim() !== '' && linkMek !== '#') {
                         const elMek = document.getElementById('navMekanismeLink');
                         if (elMek) elMek.href = linkMek.trim();
                     }
 
-                    // SYNC PENGADUAN DENGAN LINK RECENT DI GOOGLE SHEET
                     const linkPeng = f.link_pengaduan || f.linkpengaduan;
                     if (linkPeng && linkPeng.trim() !== '' && linkPeng !== '#') {
                         const elPeng = document.getElementById('topPengaduanLink');
