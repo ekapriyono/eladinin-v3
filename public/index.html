@@ -387,20 +387,20 @@
         </div>
     </div>
 
-    <!-- POP-UP MODAL ABOUT (TEMA WARNA & STYLE SENADA DENGAN WIDGET SKM) -->
+    <!-- POP-UP MODAL ABOUT (TEMA SKM, TOMBOL SILANG DI KANAN, LABEL DINAMIS) -->
     <div id="aboutModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[110] flex items-center justify-center p-4">
         <div class="bg-slate-900 text-white rounded-3xl max-w-lg w-full p-6 md:p-8 border border-blue-500/30 shadow-2xl relative overflow-hidden">
             <!-- Aksesori Siluet Glowing Senada SKM -->
             <div class="absolute -top-10 -right-10 w-36 h-36 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- Tombol Silang Pojok Kiri Atas -->
+            <!-- Header Modal: Badge Versi di Kiri & Tombol Silang di Kanan -->
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800 relative z-10">
-                <button onclick="hideAboutModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-600/80 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-lg font-bold border border-slate-700/60 shadow-sm">
-                    &times;
-                </button>
                 <span id="aboutVersiBadge" class="bg-blue-500/20 text-blue-400 border border-blue-400/30 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider font-mono">
                     E-LADININ v3.0
                 </span>
+                <button onclick="hideAboutModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-600/80 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-lg font-bold border border-slate-700/60 shadow-sm">
+                    &times;
+                </button>
             </div>
 
             <!-- Konten Pop-up Informasi -->
@@ -423,21 +423,21 @@
                     <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 flex items-start gap-x-2.5">
                         <i class="fa-solid fa-user-tie text-blue-400 mt-0.5"></i>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Pencetus Aplikasi</span>
+                            <span id="labelPencetus" class="text-[10px] uppercase font-bold text-slate-500 block">PENCETUS APLIKASI</span>
                             <span id="aboutPencetus" class="font-medium text-slate-200">...</span>
                         </div>
                     </div>
                     <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 flex items-start gap-x-2.5">
                         <i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Penggagas Aplikasi</span>
+                            <span id="labelPenggagas" class="text-[10px] uppercase font-bold text-slate-500 block">PENGGAGAS APLIKASI</span>
                             <span id="aboutPenggagas" class="font-medium text-slate-200">...</span>
                         </div>
                     </div>
                     <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 flex items-start gap-x-2.5">
                         <i class="fa-solid fa-code text-emerald-400 mt-0.5"></i>
                         <div>
-                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Pembuat & Pengembang Aplikasi</span>
+                            <span id="labelPembuat" class="text-[10px] uppercase font-bold text-slate-500 block">PEMBUAT & PENGEMBANG APLIKASI</span>
                             <span id="aboutPembuat" class="font-medium text-slate-200">...</span>
                         </div>
                     </div>
@@ -538,10 +538,13 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // INJEKSI NAKKAH DINAMIS UNTUK POPUP ABOUT
+                    // INJEKSI DATA & JUDUL DINAMIS UNTUK POPUP ABOUT
                     if (f.about_versi) document.getElementById('aboutVersiBadge').innerText = f.about_versi;
+                    if (f.about_judul_pencetus) document.getElementById('labelPencetus').innerText = f.about_judul_pencetus;
                     if (f.about_pencetus) document.getElementById('aboutPencetus').innerText = f.about_pencetus;
+                    if (f.about_judul_penggagas) document.getElementById('labelPenggagas').innerText = f.about_judul_penggagas;
                     if (f.about_penggagas) document.getElementById('aboutPenggagas').innerText = f.about_penggagas;
+                    if (f.about_judul_pembuat) document.getElementById('labelPembuat').innerText = f.about_judul_pembuat;
                     if (f.about_pembuat) document.getElementById('aboutPembuat').innerText = f.about_pembuat;
                     if (f.about_deskripsi) document.getElementById('aboutDeskripsi').innerText = f.about_deskripsi;
 
