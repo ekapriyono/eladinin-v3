@@ -328,11 +328,19 @@
 
             </div>
 
+            <!-- BOTTOMLINE FOOTER DENGAN TOMBOL ABOUT -->
             <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-y-3 text-xs text-slate-500">
                 <p id="fCopyright">© 2026 E-Ladinin v3.0. Dinas Pendidikan Kabupaten Bangkalan.</p>
-                <p id="fPengembang" class="font-mono text-[11px] bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 text-slate-400">
-                    Created by TIM IT Sekretariat Disdik
-                </p>
+
+                <div class="flex items-center gap-x-3">
+                    <button onclick="showAboutModal()" class="hover:text-blue-400 text-slate-400 transition-colors flex items-center gap-x-1.5 font-medium bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/40 px-3 py-1 rounded-lg">
+                        <i class="fa-solid fa-circle-info text-blue-400"></i>
+                        <span>Tentang Aplikasi</span>
+                    </button>
+                    <p id="fPengembang" class="font-mono text-[11px] bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 text-slate-400">
+                        Created by TIM IT Sekretariat Disdik
+                    </p>
+                </div>
             </div>
         </div>
     </footer>
@@ -375,6 +383,69 @@
                     <input type="text" id="newIcon" class="w-full border p-2.5 rounded-xl" value="fa-solid fa-gear" placeholder="Icon Class (FontAwesome)">
                 </div>
                 <button id="btnAddService" onclick="addServiceFromAdmin()" class="mt-4 w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-xl">+ Tambahkan Layanan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POP-UP MODAL ABOUT (TEMA WARNA & STYLE SENADA DENGAN WIDGET SKM) -->
+    <div id="aboutModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[110] flex items-center justify-center p-4">
+        <div class="bg-slate-900 text-white rounded-3xl max-w-lg w-full p-6 md:p-8 border border-blue-500/30 shadow-2xl relative overflow-hidden">
+            <!-- Aksesori Siluet Glowing Senada SKM -->
+            <div class="absolute -top-10 -right-10 w-36 h-36 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <!-- Tombol Silang Pojok Kiri Atas -->
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800 relative z-10">
+                <button onclick="hideAboutModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-600/80 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-lg font-bold border border-slate-700/60 shadow-sm">
+                    &times;
+                </button>
+                <span id="aboutVersiBadge" class="bg-blue-500/20 text-blue-400 border border-blue-400/30 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider font-mono">
+                    E-LADININ v3.0
+                </span>
+            </div>
+
+            <!-- Konten Pop-up Informasi -->
+            <div class="space-y-5 relative z-10">
+                <div class="flex items-center gap-3">
+                    <img src="/logo.jpg" alt="Logo" class="w-12 h-12 rounded-xl object-contain shadow-md border border-slate-700">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white tracking-tight">E-LADININ</h3>
+                        <p class="text-xs text-blue-400 font-semibold uppercase tracking-wider">Elektronik Layanan Dinas Pendidikan</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80">
+                    <p id="aboutDeskripsi" class="text-xs md:text-sm text-slate-300 leading-relaxed">
+                        Memuat informasi aplikasi...
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2.5 text-xs">
+                    <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 flex items-start gap-x-2.5">
+                        <i class="fa-solid fa-user-tie text-blue-400 mt-0.5"></i>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Pencetus Aplikasi</span>
+                            <span id="aboutPencetus" class="font-medium text-slate-200">...</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 flex items-start gap-x-2.5">
+                        <i class="fa-solid fa-lightbulb text-amber-400 mt-0.5"></i>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Penggagas Aplikasi</span>
+                            <span id="aboutPenggagas" class="font-medium text-slate-200">...</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 flex items-start gap-x-2.5">
+                        <i class="fa-solid fa-code text-emerald-400 mt-0.5"></i>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Pembuat & Pengembang Aplikasi</span>
+                            <span id="aboutPembuat" class="font-medium text-slate-200">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 text-center text-[10px] text-slate-500 border-t border-slate-800/80">
+                    Dinas Pendidikan Kabupaten Bangkalan • Powered by Google Sheets API & Node.js
+                </div>
             </div>
         </div>
     </div>
@@ -466,6 +537,13 @@
                     if (f.youtube) document.getElementById('fYoutube').href = f.youtube;
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
+
+                    // INJEKSI NAKKAH DINAMIS UNTUK POPUP ABOUT
+                    if (f.about_versi) document.getElementById('aboutVersiBadge').innerText = f.about_versi;
+                    if (f.about_pencetus) document.getElementById('aboutPencetus').innerText = f.about_pencetus;
+                    if (f.about_penggagas) document.getElementById('aboutPenggagas').innerText = f.about_penggagas;
+                    if (f.about_pembuat) document.getElementById('aboutPembuat').innerText = f.about_pembuat;
+                    if (f.about_deskripsi) document.getElementById('aboutDeskripsi').innerText = f.about_deskripsi;
 
                     const linkMek = f.link_mekanisme || f.linkmekanisme;
                     if (linkMek && linkMek.trim() !== '' && linkMek !== '#') {
@@ -597,6 +675,9 @@
 
         function showAdminModal() { document.getElementById('adminModal').classList.remove('hidden'); }
         function hideAdminModal() { document.getElementById('adminModal').classList.add('hidden'); }
+
+        function showAboutModal() { document.getElementById('aboutModal').classList.remove('hidden'); }
+        function hideAboutModal() { document.getElementById('aboutModal').classList.add('hidden'); }
 
         async function checkAdminPassword() {
             const password = document.getElementById('adminPassword').value;
