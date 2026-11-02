@@ -243,7 +243,7 @@
         </div>
     </section>
 
-    <!-- SECTION: GALERI INSTAGRAM (4 POSTINGAN TERBARU) - POSISI DI ATAS FOOTER -->
+    <!-- SECTION: GALERI INSTAGRAM (4 POSTINGAN TERBARU) -->
     <section class="max-w-screen-xl mx-auto px-6 my-16">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-xl font-extrabold border-l-4 border-pink-500 pl-3 flex items-center text-slate-900">
@@ -358,13 +358,13 @@
         </a>
     </div>
 
-    <!-- Admin Modal -->
-    <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+    <!-- Admin Modal Lengkap (Tambah Layanan & Pengaturan Narasi/Footer/About) -->
+    <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 my-8">
             <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-x-2">
                     <i class="fa-solid fa-user-shield text-blue-700"></i>
-                    <h3 class="text-lg font-bold text-slate-900">Panel Admin Layanan</h3>
+                    <h3 class="text-lg font-bold text-slate-900">Panel Admin & Pengaturan Portal</h3>
                 </div>
                 <button onclick="hideAdminModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
@@ -374,26 +374,93 @@
                 <button id="btnLogin" onclick="checkAdminPassword()" class="w-full py-2.5 bg-blue-700 hover:bg-blue-800 text-white font-semibold text-sm rounded-xl">Masuk Mode Admin</button>
             </div>
             
-            <div id="adminPanel" class="hidden">
-                <div class="space-y-3 text-xs">
+            <div id="adminPanel" class="hidden space-y-6 max-h-[75vh] overflow-y-auto pr-2">
+                <!-- Tab Menu Navigasi Admin -->
+                <div class="flex border-b border-slate-200 text-xs font-bold">
+                    <button onclick="switchAdminTab('layanan')" id="tabBtnLayanan" class="px-4 py-2 border-b-2 border-blue-600 text-blue-700">Tambah Layanan</button>
+                    <button onclick="switchAdminTab('pengaturan')" id="tabBtnPengaturan" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Edit Pengaturan & Narasi</button>
+                </div>
+
+                <!-- Konten Tab 1: Tambah Layanan -->
+                <div id="adminTabLayanan" class="space-y-3 text-xs">
+                    <h4 class="font-bold text-slate-800 text-sm mb-2"><i class="fa-solid fa-plus-circle text-emerald-600 mr-1"></i> Tambah Layanan Baru</h4>
                     <input type="text" id="newJudul" class="w-full border p-2.5 rounded-xl" placeholder="Judul Layanan">
                     <textarea id="newDeskripsi" class="w-full border p-2.5 rounded-xl" placeholder="Deskripsi Singkat"></textarea>
                     <input type="text" id="newLink" class="w-full border p-2.5 rounded-xl" placeholder="Link URL Tujuan">
                     <input type="text" id="newKategori" class="w-full border p-2.5 rounded-xl" placeholder="Kategori (misal: Kepegawaian)">
                     <input type="text" id="newIcon" class="w-full border p-2.5 rounded-xl" value="fa-solid fa-gear" placeholder="Icon Class (FontAwesome)">
+                    <button onclick="addServiceFromAdmin()" class="mt-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl">+ Tambahkan Layanan</button>
                 </div>
-                <button id="btnAddService" onclick="addServiceFromAdmin()" class="mt-4 w-full py-2.5 bg-emerald-600 text-white font-semibold rounded-xl">+ Tambahkan Layanan</button>
+
+                <!-- Konten Tab 2: Form Pengaturan Dinamis -->
+                <div id="adminTabPengaturan" class="hidden space-y-4 text-xs">
+                    <h4 class="font-bold text-slate-800 text-sm mb-2"><i class="fa-solid fa-sliders text-blue-600 mr-1"></i> Pengaturan Footer & Informasi Pop-up About</h4>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Versi Aplikasi:</label>
+                            <input type="text" id="cfgAboutVersi" class="w-full border p-2 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Telepon Instansi:</label>
+                            <input type="text" id="cfgTelepon" class="w-full border p-2 rounded-xl">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Alamat Instansi:</label>
+                        <input type="text" id="cfgAlamat" class="w-full border p-2 rounded-xl">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Judul Label 1 (Pencetus):</label>
+                            <input type="text" id="cfgAboutJudulPencetus" class="w-full border p-2 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Nama Pencetus:</label>
+                            <input type="text" id="cfgAboutPencetus" class="w-full border p-2 rounded-xl">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Judul Label 2 (Penggagas):</label>
+                            <input type="text" id="cfgAboutJudulPenggagas" class="w-full border p-2 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Nama Penggagas:</label>
+                            <input type="text" id="cfgAboutPenggagas" class="w-full border p-2 rounded-xl">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Judul Label 3 (Pembuat):</label>
+                            <input type="text" id="cfgAboutJudulPembuat" class="w-full border p-2 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="font-bold text-slate-600 block mb-1">Nama Pembuat:</label>
+                            <input type="text" id="cfgAboutPembuat" class="w-full border p-2 rounded-xl">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="font-bold text-slate-600 block mb-1">Deskripsi Pop-up Tentang Aplikasi:</label>
+                        <textarea id="cfgAboutDeskripsi" rows="3" class="w-full border p-2 rounded-xl"></textarea>
+                    </div>
+
+                    <button onclick="saveSettingsFromAdmin()" class="mt-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl">💾 Simpan Perubahan Pengaturan</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- POP-UP MODAL ABOUT (TEMA SKM, TOMBOL SILANG DI KANAN, LABEL DINAMIS) -->
+    <!-- POP-UP MODAL ABOUT -->
     <div id="aboutModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[110] flex items-center justify-center p-4">
         <div class="bg-slate-900 text-white rounded-3xl max-w-lg w-full p-6 md:p-8 border border-blue-500/30 shadow-2xl relative overflow-hidden">
-            <!-- Aksesori Siluet Glowing Senada SKM -->
             <div class="absolute -top-10 -right-10 w-36 h-36 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
 
-            <!-- Header Modal: Badge Versi di Kiri & Tombol Silang di Kanan -->
             <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800 relative z-10">
                 <span id="aboutVersiBadge" class="bg-blue-500/20 text-blue-400 border border-blue-400/30 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider font-mono">
                     E-LADININ v3.0
@@ -403,7 +470,6 @@
                 </button>
             </div>
 
-            <!-- Konten Pop-up Informasi -->
             <div class="space-y-5 relative z-10">
                 <div class="flex items-center gap-3">
                     <img src="/logo.jpg" alt="Logo" class="w-12 h-12 rounded-xl object-contain shadow-md border border-slate-700">
@@ -452,6 +518,7 @@
 
     <script>
         let allServices = [];
+        let globalFooterData = {};
 
         function updateClock() {
             const now = new Date();
@@ -519,6 +586,7 @@
                 }
 
                 if (data.footer) {
+                    globalFooterData = data.footer;
                     const f = data.footer;
                     if (f.deskripsi) document.getElementById('fDeskripsi').innerText = f.deskripsi;
                     if (f.alamat) document.getElementById('fAlamat').innerText = f.alamat;
@@ -538,7 +606,7 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // INJEKSI DATA & JUDUL DINAMIS UNTUK POPUP ABOUT
+                    // Injeksi About Modal
                     if (f.about_versi) document.getElementById('aboutVersiBadge').innerText = f.about_versi;
                     if (f.about_judul_pencetus) document.getElementById('labelPencetus').innerText = f.about_judul_pencetus;
                     if (f.about_pencetus) document.getElementById('aboutPencetus').innerText = f.about_pencetus;
@@ -547,6 +615,18 @@
                     if (f.about_judul_pembuat) document.getElementById('labelPembuat').innerText = f.about_judul_pembuat;
                     if (f.about_pembuat) document.getElementById('aboutPembuat').innerText = f.about_pembuat;
                     if (f.about_deskripsi) document.getElementById('aboutDeskripsi').innerText = f.about_deskripsi;
+
+                    // Sync Form Admin Pengaturan
+                    if(document.getElementById('cfgAboutVersi')) document.getElementById('cfgAboutVersi').value = f.about_versi || '';
+                    if(document.getElementById('cfgTelepon')) document.getElementById('cfgTelepon').value = f.telepon || '';
+                    if(document.getElementById('cfgAlamat')) document.getElementById('cfgAlamat').value = f.alamat || '';
+                    if(document.getElementById('cfgAboutJudulPencetus')) document.getElementById('cfgAboutJudulPencetus').value = f.about_judul_pencetus || '';
+                    if(document.getElementById('cfgAboutPencetus')) document.getElementById('cfgAboutPencetus').value = f.about_pencetus || '';
+                    if(document.getElementById('cfgAboutJudulPenggagas')) document.getElementById('cfgAboutJudulPenggagas').value = f.about_judul_penggagas || '';
+                    if(document.getElementById('cfgAboutPenggagas')) document.getElementById('cfgAboutPenggagas').value = f.about_penggagas || '';
+                    if(document.getElementById('cfgAboutJudulPembuat')) document.getElementById('cfgAboutJudulPembuat').value = f.about_judul_pembuat || '';
+                    if(document.getElementById('cfgAboutPembuat')) document.getElementById('cfgAboutPembuat').value = f.about_pembuat || '';
+                    if(document.getElementById('cfgAboutDeskripsi')) document.getElementById('cfgAboutDeskripsi').value = f.about_deskripsi || '';
 
                     const linkMek = f.link_mekanisme || f.linkmekanisme;
                     if (linkMek && linkMek.trim() !== '' && linkMek !== '#') {
@@ -682,6 +762,20 @@
         function showAboutModal() { document.getElementById('aboutModal').classList.remove('hidden'); }
         function hideAboutModal() { document.getElementById('aboutModal').classList.add('hidden'); }
 
+        function switchAdminTab(tabName) {
+            if(tabName === 'layanan') {
+                document.getElementById('adminTabLayanan').classList.remove('hidden');
+                document.getElementById('adminTabPengaturan').classList.add('hidden');
+                document.getElementById('tabBtnLayanan').className = "px-4 py-2 border-b-2 border-blue-600 text-blue-700";
+                document.getElementById('tabBtnPengaturan').className = "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+            } else {
+                document.getElementById('adminTabLayanan').classList.add('hidden');
+                document.getElementById('adminTabPengaturan').classList.remove('hidden');
+                document.getElementById('tabBtnPengaturan').className = "px-4 py-2 border-b-2 border-blue-600 text-blue-700";
+                document.getElementById('tabBtnLayanan').className = "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+            }
+        }
+
         async function checkAdminPassword() {
             const password = document.getElementById('adminPassword').value;
             const res = await fetch('/api/check-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
@@ -704,6 +798,33 @@
             alert(data.message);
             hideAdminModal();
             loadData();
+        }
+
+        async function saveSettingsFromAdmin() {
+            const payload = {
+                about_versi: document.getElementById('cfgAboutVersi').value,
+                telepon: document.getElementById('cfgTelepon').value,
+                alamat: document.getElementById('cfgAlamat').value,
+                about_judul_pencetus: document.getElementById('cfgAboutJudulPencetus').value,
+                about_pencetus: document.getElementById('cfgAboutPencetus').value,
+                about_judul_penggagas: document.getElementById('cfgAboutJudulPenggagas').value,
+                about_penggagas: document.getElementById('cfgAboutPenggagas').value,
+                about_judul_pembuat: document.getElementById('cfgAboutJudulPembuat').value,
+                about_pembuat: document.getElementById('cfgAboutPembuat').value,
+                about_deskripsi: document.getElementById('cfgAboutDeskripsi').value
+            };
+
+            const res = await fetch('/api/update-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) {
+                hideAdminModal();
+                loadData();
+            }
         }
 
         window.onload = loadData;
