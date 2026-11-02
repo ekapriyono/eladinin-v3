@@ -25,13 +25,19 @@ const getSheetsClient = async () => {
     return google.sheets({ version: 'v4', auth: client });
 };
 
-// Fungsi Bantu: Konversi Link Postingan IG Menjadi Thumbnail Otomatis
+// Fungsi Bantu: Resolve Thumbnail Instagram yang Lebih Stabil
 async function resolveIgThumbnail(url) {
     if (!url || url === '#') return 'https://via.placeholder.com/300';
+    
+    // Jika admin memasukkan direct link gambar (.jpg, .png, .webp), langsung gunakan
     if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) return url;
     
+    // Jika memasukkan link postingan IG, gunakan format alternatif atau arahkan ke placeholder/fallback aman
     try {
         if (url.includes('/p/') || url.includes('/reel/')) {
+            // Instagram sering memblokir hotlink langsung via tag img standar tanpa token graph api.
+            // Solusi paling aman & stabil: Admin dapat menggunakan direct link gambar dari ImgBB/Postimages, 
+            // atau kita sediakan fallback ke URL media jika diizinkan browser.
             const cleanUrl = url.split('?')[0];
             return `${cleanUrl.endsWith('/') ? cleanUrl : cleanUrl + '/'}media/?size=l`;
         }
