@@ -25,7 +25,23 @@ const getSheetsClient = async () => {
     return google.sheets({ version: 'v4', auth: client });
 };
 
-// API Utama: Membaca Data Spreadsheet Realtime (Tanpa Cache)
+// Fungsi Bantu: Konversi Link Postingan IG Menjadi Thumbnail Otomatis
+async function resolveIgThumbnail(url) {
+    if (!url || url === '#') return 'https://via.placeholder.com/300';
+    if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) return url;
+    
+    try {
+        if (url.includes('/p/') || url.includes('/reel/')) {
+            const cleanUrl = url.split('?')[0];
+            return `${cleanUrl.endsWith('/') ? cleanUrl : cleanUrl + '/'}media/?size=l`;
+        }
+        return url;
+    } catch (e) {
+        return 'https://via.placeholder.com/300';
+    }
+}
+
+// API Utama: Membaca Data Spreadsheet Realtime
 app.get('/api/data', async (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -116,28 +132,32 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet SKM:", e.message); 
         }
 
-        // 5. Sheet Instagram Feed (4 Postingan Terbaru)
+        // 5. Sheet Instagram Feed (Mengambil Baris 2 sampai 5)
         let instagramFeed = [];
+        let instagramRaw = [];
         try {
             const resIg = await sheets.spreadsheets.values.get({
                 spreadsheetId,
                 range: 'Instagram!A2:C5',
             });
             const igRows = resIg.data.values || [];
-            igRows.forEach(row => {
-                if (row[0] || row[1]) {
+            instagramRaw = igRows; // Untuk dikirim ke admin form
+            for (let row of igRows) {
+                if (row[0] || row[1] || row[2]) {
+                    const postUrl = row[2] || row[1] || '#';
+                    const resolvedImg = await resolveIgThumbnail(postUrl);
                     instagramFeed.push({
                         judul: row[0] || 'Postingan Instagram Dinas Pendidikan',
-                        gambar: row[1] || 'https://via.placeholder.com/300',
-                        link: row[2] || 'https://instagram.com'
+                        gambar: resolvedImg,
+                        link: postUrl
                     });
                 }
-            });
+            }
         } catch (e) {
             console.error("Error Sheet Instagram:", e.message);
         }
 
-        // 6. Sheet Footer & Counter Pengunjung
+        // 6. Sheet Footer & Settings Data
         let footer = {
             deskripsi: "Sistem Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan.",
             alamat: "Jl. Soekarno Hatta No. 23, Bangkalan - Madura",
@@ -151,7 +171,15 @@ app.get('/api/data', async (req, res) => {
             copyright: "© 2026 E-Ladinin v3.0. Dinas Pendidikan Kabupaten Bangkalan.",
             pengembang: "Created by TIM IT Sekretariat Disdik",
             link_mekanisme: "#",
-            link_pengaduan: "#"
+            link_pengaduan: "#",
+            about_versi: "v3.0 (Official Build 2026)",
+            about_judul_pencetus: "PENCETUS APLIKASI",
+            about_pencetus: "Kepala Dinas Pendidikan Kabupaten Bangkalan",
+            about_judul_penggagas: "PENGGAGAS APLIKASI",
+            about_penggagas: "Bidang Pembinaan & Sekretariat Disdik Bangkalan",
+            about_judul_pembuat: "PEMBUAT & PENGEMBANG APLIKASI",
+            about_pembuat: "TIM IT Sekretariat Dinas Pendidikan Kabupaten Bangkalan",
+            about_deskripsi: "E-Ladinin (Elektronik Layanan Dinas Pendidikan) merupakan inovasi portal layanan publik terpadu berbasis digital untuk meningkatkan transparansi, efisiensi, dan akuntabilitas pelayanan administrasi pendidikan di Kabupaten Bangkalan."
         };
 
         let currentVisitCount = 6911;
@@ -164,7 +192,7 @@ app.get('/api/data', async (req, res) => {
             });
             const ftRows = resFooter.data.values || [];
             ftRows.forEach((row, index) => {
-                if (row[0] && row[1]) {
+                if (row[0] && row[1] !== undefined) {
                     const key = row[0].toString().toLowerCase().trim().replace(/\s+/g, '_');
                     const val = row[1].toString().trim();
 
@@ -192,12 +220,13 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet Footer/Counter:", e.message); 
         }
 
-        res.json({ services, announcement, faqs, skm, instagramFeed, footer, visitCount: currentVisitCount });
+        res.json({ services, announcement, faqs, skm, instagramFeed, instagramRaw, footer, visitCount: currentVisitCount });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
+// Endpoint Tambah Layanan
 app.post('/api/add-service', async (req, res) => {
     try {
         const { judul, deskripsi, link, icon, kategori } = req.body;
@@ -222,6 +251,73 @@ app.post('/api/add-service', async (req, res) => {
         res.json({ status: 'success', message: '✅ Layanan berhasil ditambahkan!' });
     } catch (error) {
         res.json({ status: 'error', message: '❌ Error: ' + error.message });
+    }
+});
+
+// Endpoint Simpan Pengaturan Footer & About
+app.post('/api/update-settings', async (req, res) => {
+    try {
+        const settings = req.body;
+        const sheets = await getSheetsClient();
+        const spreadsheetId = process.env.SPREADSHEET_ID;
+
+        const resFooter = await sheets.spreadsheets.values.get({
+            spreadsheetId,
+            range: 'Footer!A1:B100',
+        });
+        const rows = resFooter.data.values || [];
+
+        for (const [key, val] of Object.entries(settings)) {
+            let foundIndex = -1;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i][0] && rows[i][0].toString().toLowerCase().trim().replace(/\s+/g, '_') === key) {
+                    foundIndex = i + 1;
+                    break;
+                }
+            }
+
+            if (foundIndex !== -1) {
+                await sheets.spreadsheets.values.update({
+                    spreadsheetId,
+                    range: `Footer!B${foundIndex}`,
+                    valueInputOption: 'USER_ENTERED',
+                    requestBody: { values: [[val]] }
+                });
+            } else {
+                await sheets.spreadsheets.values.append({
+                    spreadsheetId,
+                    range: 'Footer!A:B',
+                    valueInputOption: 'USER_ENTERED',
+                    requestBody: { values: [[key, val]] }
+                });
+            }
+        }
+
+        res.json({ success: true, message: '✅ Pengaturan berhasil diperbarui!' });
+    } catch (error) {
+        res.json({ success: false, message: '❌ Gagal memperbarui pengaturan: ' + error.message });
+    }
+});
+
+// Endpoint Update Feed Instagram dari Panel Admin
+app.post('/api/update-instagram', async (req, res) => {
+    try {
+        const { posts } = req.body; 
+        const sheets = await getSheetsClient();
+        const spreadsheetId = process.env.SPREADSHEET_ID;
+
+        const values = posts.map(p => [p.judul || '', p.link || '', p.link || '']);
+
+        await sheets.spreadsheets.values.update({
+            spreadsheetId,
+            range: 'Instagram!A2:C5',
+            valueInputOption: 'USER_ENTERED',
+            requestBody: { values }
+        });
+
+        res.json({ success: true, message: '✅ Feed Instagram berhasil diperbarui!' });
+    } catch (error) {
+        res.json({ success: false, message: '❌ Gagal memperbarui IG: ' + error.message });
     }
 });
 
