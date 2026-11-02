@@ -358,7 +358,7 @@
         </a>
     </div>
 
-    <!-- Admin Modal Lengkap (Tambah Layanan & Pengaturan Narasi/Footer/About) -->
+    <!-- Admin Modal Lengkap (Tab 1: Tambah Layanan | Tab 2: Kelola IG | Tab 3: Pengaturan Narasi) -->
     <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 my-8">
             <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
@@ -376,9 +376,10 @@
             
             <div id="adminPanel" class="hidden space-y-6 max-h-[75vh] overflow-y-auto pr-2">
                 <!-- Tab Menu Navigasi Admin -->
-                <div class="flex border-b border-slate-200 text-xs font-bold">
-                    <button onclick="switchAdminTab('layanan')" id="tabBtnLayanan" class="px-4 py-2 border-b-2 border-blue-600 text-blue-700">Tambah Layanan</button>
-                    <button onclick="switchAdminTab('pengaturan')" id="tabBtnPengaturan" class="px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Edit Pengaturan & Narasi</button>
+                <div class="flex border-b border-slate-200 text-xs font-bold gap-x-2">
+                    <button onclick="switchAdminTab('layanan')" id="tabBtnLayanan" class="px-3 py-2 border-b-2 border-blue-600 text-blue-700">Tambah Layanan</button>
+                    <button onclick="switchAdminTab('instagram')" id="tabBtnInstagram" class="px-3 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Kelola 4 Postingan IG</button>
+                    <button onclick="switchAdminTab('pengaturan')" id="tabBtnPengaturan" class="px-3 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Edit Pengaturan & Narasi</button>
                 </div>
 
                 <!-- Konten Tab 1: Tambah Layanan -->
@@ -392,7 +393,19 @@
                     <button onclick="addServiceFromAdmin()" class="mt-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl">+ Tambahkan Layanan</button>
                 </div>
 
-                <!-- Konten Tab 2: Form Pengaturan Dinamis -->
+                <!-- Konten Tab 2: Kelola Feed Instagram -->
+                <div id="adminTabInstagram" class="hidden space-y-4 text-xs">
+                    <h4 class="font-bold text-slate-800 text-sm mb-1"><i class="fa-brands fa-instagram text-pink-600 mr-1"></i> Kelola 4 Postingan Instagram Terbaru</h4>
+                    <p class="text-slate-500 text-[11px] mb-3">Cukup masukkan Judul/Caption singkat dan Link URL Postingan Instagram asli (thumbnail akan otomatis ditarik oleh sistem).</p>
+                    
+                    <div class="space-y-4" id="igFormContainer">
+                        <!-- Form 1 sampai 4 di-generate via JS -->
+                    </div>
+
+                    <button onclick="saveInstagramFromAdmin()" class="mt-2 w-full py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-xl">💾 Simpan Feed Instagram</button>
+                </div>
+
+                <!-- Konten Tab 3: Form Pengaturan Dinamis -->
                 <div id="adminTabPengaturan" class="hidden space-y-4 text-xs">
                     <h4 class="font-bold text-slate-800 text-sm mb-2"><i class="fa-solid fa-sliders text-blue-600 mr-1"></i> Pengaturan Footer & Informasi Pop-up About</h4>
                     
@@ -585,6 +598,9 @@
                     });
                 }
 
+                // Render form IG di Admin Modal
+                renderIgAdminForm(data.instagramRaw || []);
+
                 if (data.footer) {
                     globalFooterData = data.footer;
                     const f = data.footer;
@@ -649,6 +665,24 @@
 
             } catch (err) {
                 console.error("Error loading data:", err);
+            }
+        }
+
+        function renderIgAdminForm(rawRows) {
+            const container = document.getElementById('igFormContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            for(let i = 0; i < 4; i++) {
+                const row = rawRows[i] || [];
+                const judul = row[0] || '';
+                const link = row[2] || row[1] || '';
+                container.innerHTML += `
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                        <span class="font-bold text-slate-700 block">Postingan IG #${i+1}</span>
+                        <input type="text" id="igJudul_${i}" value="${judul}" class="w-full border p-2 rounded-lg bg-white" placeholder="Judul / Caption Postingan">
+                        <input type="text" id="igLink_${i}" value="${link}" class="w-full border p-2 rounded-lg bg-white" placeholder="Link URL Postingan IG (Cth: https://www.instagram.com/p/...)">
+                    </div>
+                `;
             }
         }
 
@@ -763,16 +797,22 @@
         function hideAboutModal() { document.getElementById('aboutModal').classList.add('hidden'); }
 
         function switchAdminTab(tabName) {
+            document.getElementById('adminTabLayanan').classList.add('hidden');
+            document.getElementById('adminTabInstagram').classList.add('hidden');
+            document.getElementById('adminTabPengaturan').classList.add('hidden');
+            document.getElementById('tabBtnLayanan').className = "px-3 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+            document.getElementById('tabBtnInstagram').className = "px-3 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+            document.getElementById('tabBtnPengaturan').className = "px-3 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+
             if(tabName === 'layanan') {
                 document.getElementById('adminTabLayanan').classList.remove('hidden');
-                document.getElementById('adminTabPengaturan').classList.add('hidden');
-                document.getElementById('tabBtnLayanan').className = "px-4 py-2 border-b-2 border-blue-600 text-blue-700";
-                document.getElementById('tabBtnPengaturan').className = "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+                document.getElementById('tabBtnLayanan').className = "px-3 py-2 border-b-2 border-blue-600 text-blue-700";
+            } else if(tabName === 'instagram') {
+                document.getElementById('adminTabInstagram').classList.remove('hidden');
+                document.getElementById('tabBtnInstagram').className = "px-3 py-2 border-b-2 border-blue-600 text-blue-700";
             } else {
-                document.getElementById('adminTabLayanan').classList.add('hidden');
                 document.getElementById('adminTabPengaturan').classList.remove('hidden');
-                document.getElementById('tabBtnPengaturan').className = "px-4 py-2 border-b-2 border-blue-600 text-blue-700";
-                document.getElementById('tabBtnLayanan').className = "px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800";
+                document.getElementById('tabBtnPengaturan').className = "px-3 py-2 border-b-2 border-blue-600 text-blue-700";
             }
         }
 
@@ -798,6 +838,28 @@
             alert(data.message);
             hideAdminModal();
             loadData();
+        }
+
+        async function saveInstagramFromAdmin() {
+            let posts = [];
+            for(let i = 0; i < 4; i++) {
+                posts.push({
+                    judul: document.getElementById(`igJudul_${i}`).value,
+                    link: document.getElementById(`igLink_${i}`).value
+                });
+            }
+
+            const res = await fetch('/api/update-instagram', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ posts })
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) {
+                hideAdminModal();
+                loadData();
+            }
         }
 
         async function saveSettingsFromAdmin() {
