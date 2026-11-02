@@ -358,7 +358,7 @@
         </a>
     </div>
 
-    <!-- Admin Modal Lengkap (Tab 1: Tambah Layanan | Tab 2: Kelola IG | Tab 3: Pengaturan Narasi) -->
+    <!-- Admin Modal Lengkap (Tab 1: Tambah Layanan | Tab 2: Kelola IG dengan Kolom Link Gambar & Link Postingan) -->
     <div id="adminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 my-8">
             <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-100">
@@ -393,10 +393,10 @@
                     <button onclick="addServiceFromAdmin()" class="mt-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl">+ Tambahkan Layanan</button>
                 </div>
 
-                <!-- Konten Tab 2: Kelola Feed Instagram -->
+                <!-- Konten Tab 2: Kelola Feed Instagram (Dengan Input Gambar & Tautan Tujuan) -->
                 <div id="adminTabInstagram" class="hidden space-y-4 text-xs">
                     <h4 class="font-bold text-slate-800 text-sm mb-1"><i class="fa-brands fa-instagram text-pink-600 mr-1"></i> Kelola 4 Postingan Instagram Terbaru</h4>
-                    <p class="text-slate-500 text-[11px] mb-3">Cukup masukkan Judul/Caption singkat dan Link URL Postingan Instagram asli (thumbnail akan otomatis ditarik oleh sistem).</p>
+                    <p class="text-slate-500 text-[11px] mb-3">Masukkan Judul, Link GDrive/Gambar (otomatis dikonversi ke direct image), dan Link URL Postingan IG.</p>
                     
                     <div class="space-y-4" id="igFormContainer">
                         <!-- Form 1 sampai 4 di-generate via JS -->
@@ -598,7 +598,7 @@
                     });
                 }
 
-                // Render form IG di Admin Modal
+                // Render form IG di Admin dengan 2 input terpisah (Link Gambar & Link Postingan)
                 renderIgAdminForm(data.instagramRaw || []);
 
                 if (data.footer) {
@@ -675,12 +675,14 @@
             for(let i = 0; i < 4; i++) {
                 const row = rawRows[i] || [];
                 const judul = row[0] || '';
-                const link = row[2] || row[1] || '';
+                const gambar = row[1] || '';
+                const link = row[2] || '';
                 container.innerHTML += `
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                        <span class="font-bold text-slate-700 block">Postingan IG #${i+1}</span>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <span class="font-bold text-slate-700 block text-xs">Postingan IG #${i+1}</span>
                         <input type="text" id="igJudul_${i}" value="${judul}" class="w-full border p-2 rounded-lg bg-white" placeholder="Judul / Caption Postingan">
-                        <input type="text" id="igLink_${i}" value="${link}" class="w-full border p-2 rounded-lg bg-white" placeholder="Link URL Postingan IG (Cth: https://www.instagram.com/p/...)">
+                        <input type="text" id="igGambar_${i}" value="${gambar}" class="w-full border p-2 rounded-lg bg-white" placeholder="Paste Link GDrive / Direct Image Link Disini">
+                        <input type="text" id="igLink_${i}" value="${link}" class="w-full border p-2 rounded-lg bg-white" placeholder="Link URL Tujuan Postingan IG">
                     </div>
                 `;
             }
@@ -845,6 +847,7 @@
             for(let i = 0; i < 4; i++) {
                 posts.push({
                     judul: document.getElementById(`igJudul_${i}`).value,
+                    gambar: document.getElementById(`igGambar_${i}`).value,
                     link: document.getElementById(`igLink_${i}`).value
                 });
             }

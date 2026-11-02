@@ -25,19 +25,26 @@ const getSheetsClient = async () => {
     return google.sheets({ version: 'v4', auth: client });
 };
 
-// Fungsi Bantu: Resolve Thumbnail Instagram yang Lebih Stabil
+// Fungsi Otomatis Konversi Link Google Drive & IG Menjadi Direct Image Link
 async function resolveIgThumbnail(url) {
     if (!url || url === '#') return 'https://via.placeholder.com/300';
     
-    // Jika admin memasukkan direct link gambar (.jpg, .png, .webp), langsung gunakan
-    if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) return url;
+    // 1. Jika link Google Drive standar (share link), otomatis ubah jadi direct link lh3
+    if (url.includes('drive.google.com')) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
+    }
+
+    // 2. Jika sudah direct link gambar atau lh3 googleusercontent
+    if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.includes('lh3.googleusercontent.com')) {
+        return url;
+    }
     
-    // Jika memasukkan link postingan IG, gunakan format alternatif atau arahkan ke placeholder/fallback aman
+    // 3. Fallback jika link postingan IG biasa
     try {
         if (url.includes('/p/') || url.includes('/reel/')) {
-            // Instagram sering memblokir hotlink langsung via tag img standar tanpa token graph api.
-            // Solusi paling aman & stabil: Admin dapat menggunakan direct link gambar dari ImgBB/Postimages, 
-            // atau kita sediakan fallback ke URL media jika diizinkan browser.
             const cleanUrl = url.split('?')[0];
             return `${cleanUrl.endsWith('/') ? cleanUrl : cleanUrl + '/'}media/?size=l`;
         }
@@ -138,7 +145,7 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet SKM:", e.message); 
         }
 
-        // 5. Sheet Instagram Feed (Mengambil Baris 2 sampai 5)
+        // 5. Sheet Instagram Feed
         let instagramFeed = [];
         let instagramRaw = [];
         try {
@@ -147,15 +154,16 @@ app.get('/api/data', async (req, res) => {
                 range: 'Instagram!A2:C5',
             });
             const igRows = resIg.data.values || [];
-            instagramRaw = igRows; // Untuk dikirim ke admin form
+            instagramRaw = igRows;
             for (let row of igRows) {
                 if (row[0] || row[1] || row[2]) {
-                    const postUrl = row[2] || row[1] || '#';
-                    const resolvedImg = await resolveIgThumbnail(postUrl);
+                    const imgInput = row[1] || row[2] || '#';
+                    const postLink = row[2] || '#';
+                    const resolvedImg = await resolveIgThumbnail(imgInput);
                     instagramFeed.push({
                         judul: row[0] || 'Postingan Instagram Dinas Pendidikan',
                         gambar: resolvedImg,
-                        link: postUrl
+                        link: postLink
                     });
                 }
             }
@@ -305,14 +313,14 @@ app.post('/api/update-settings', async (req, res) => {
     }
 });
 
-// Endpoint Update Feed Instagram dari Panel Admin
+// Endpoint Update Feed Instagram dari Panel Admin (Menyimpan Judul, Gambar, Link Tujuan)
 app.post('/api/update-instagram', async (req, res) => {
     try {
-        const { posts } = req.body; 
+        const { posts } = req.body; // Array berisi 4 object {judul, gambar, link}
         const sheets = await getSheetsClient();
         const spreadsheetId = process.env.SPREADSHEET_ID;
 
-        const values = posts.map(p => [p.judul || '', p.link || '', p.link || '']);
+        const values = posts.map(p => [p.judul || '', p.gambar || '', p.link || '']);
 
         await sheets.spreadsheets.values.update({
             spreadsheetId,
