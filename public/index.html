@@ -176,7 +176,7 @@
     </header>
 
     <!-- Widget SKM 3D -->
-    <section class="max-w-screen-xl mx-auto px-6 -mt-10 relative z-20 mb-10">
+    <section class="max-w-screen-xl mx-auto px-6 -mt-10 relative z-20 mb-6">
         <div class="card-3d bg-slate-900/90 text-white rounded-3xl p-6 md:p-8 backdrop-blur-xl border border-blue-500/30 shadow-2xl relative overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
                 <div class="md:col-span-5 flex items-center gap-6 border-b md:border-b-0 md:border-r border-slate-800 pb-6 md:pb-0 md:pr-6">
@@ -215,76 +215,58 @@
         </div>
     </section>
 
-    <!-- SECTION: GRAFIK JUMLAH ASN (PNS, PPPK, PPPK PW) -->
-    <section id="statistik-asn" class="max-w-screen-xl mx-auto px-6 mb-12 relative z-20">
-        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-100">
-                <div>
-                    <div class="flex items-center gap-x-2 text-blue-700 font-bold text-xs uppercase tracking-widest mb-1">
-                        <i class="fa-solid fa-chart-column"></i>
-                        <span>Rekapitulasi Kepegawaian</span>
+    <!-- SECTION: GRAFIK JUMLAH ASN (MEMANJANG SEJAJAR IKM & PROPORSIONAL) -->
+    <section id="statistik-asn" class="max-w-screen-xl mx-auto px-6 mb-10 relative z-20">
+        <div class="bg-white rounded-3xl p-5 md:px-7 md:py-6 border border-slate-200/90 shadow-lg">
+            <!-- Header Baris Atas Ringkas -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600/10 text-blue-700 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-chart-column text-base"></i>
                     </div>
-                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Grafik Jumlah ASN</h2>
-                    <p id="asnKeterangan" class="text-xs text-slate-500 mt-1">Klik pada angka jumlah untuk melihat rincian tabel pop-up.</p>
+                    <div>
+                        <h2 class="text-base md:text-lg font-extrabold text-slate-900 tracking-tight leading-tight">Grafik Jumlah ASN (PNS, PPPK, PPPK PW)</h2>
+                        <p id="asnKeterangan" class="text-[11px] text-slate-500">Klik pada angka jumlah untuk melihat rincian tabel rekapitulasi.</p>
+                    </div>
                 </div>
-
-                <!-- Angka Total ASN yang bisa diklik -->
-                <button type="button" onclick="openAsnDetailModal('ALL')" class="group text-left bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-5 py-3.5 rounded-2xl shadow-md shadow-blue-600/20 transition-all cursor-pointer">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-100 block">Total ASN (Klik Rincian)</span>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <span id="asnTotalDisplay" class="text-2xl font-extrabold font-mono underline decoration-blue-300/60 underline-offset-4">0</span>
-                        <i class="fa-solid fa-table-list text-xs text-blue-200 group-hover:scale-110 transition-transform"></i>
-                    </div>
-                </button>
+                <span class="text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/70 px-3 py-1 rounded-full self-start sm:self-auto">
+                    <i class="fa-solid fa-hand-pointer mr-1"></i> Klik angka = Rincian Pop-up
+                </span>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <!-- Grafik Chart.js -->
-                <div class="lg:col-span-7 bg-slate-50/80 rounded-2xl p-4 border border-slate-200/70">
-                    <div class="relative h-64 w-full">
+            <!-- Konten Memanjang Sejajar: Grafik di Kiri, Baris Jumlah Proporsional di Kanan -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                <!-- Grafik Ringkas Memanjang -->
+                <div class="lg:col-span-5 bg-slate-50/90 rounded-2xl p-3 border border-slate-200/70">
+                    <div class="relative h-36 w-full">
                         <canvas id="asnChartCanvas"></canvas>
                     </div>
                 </div>
 
-                <!-- Kartu Angka Per Kategori (Klik untuk buka Pop-up Rincian) -->
-                <div class="lg:col-span-5 grid grid-cols-1 gap-3.5">
-                    <button type="button" onclick="openAsnDetailModal('PNS')" class="flex items-center justify-between p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/80 transition-all text-left cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
-                                <i class="fa-solid fa-id-badge text-lg"></i>
-                            </div>
-                            <div>
-                                <span class="text-xs font-extrabold text-blue-900 block">PNS</span>
-                                <span class="text-[11px] text-blue-700/80">Klik angka untuk rincian</span>
-                            </div>
-                        </div>
-                        <span id="asnPnsDisplay" class="text-xl font-extrabold font-mono text-blue-700 underline decoration-blue-400 underline-offset-4 group-hover:scale-105 transition-transform">0</span>
+                <!-- 4 Baris Jumlah Proporsional (PNS, PPPK, PPPK PW, Total) -->
+                <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <button type="button" onclick="openAsnDetailModal('PNS')" class="p-3.5 rounded-2xl bg-blue-50/70 hover:bg-blue-100/90 border border-blue-200/80 transition-all text-left cursor-pointer group">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-700 block">PNS</span>
+                        <span id="asnPnsDisplay" class="text-lg md:text-xl font-extrabold font-mono text-blue-900 underline decoration-blue-400 underline-offset-4 block mt-1 group-hover:scale-105 origin-left transition-transform">0</span>
+                        <span class="text-[10px] text-blue-600/80 mt-0.5 block">Klik rincian</span>
                     </button>
 
-                    <button type="button" onclick="openAsnDetailModal('PPPK')" class="flex items-center justify-between p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 transition-all text-left cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
-                                <i class="fa-solid fa-user-check text-lg"></i>
-                            </div>
-                            <div>
-                                <span class="text-xs font-extrabold text-emerald-900 block">PPPK</span>
-                                <span class="text-[11px] text-emerald-700/80">Klik angka untuk rincian</span>
-                            </div>
-                        </div>
-                        <span id="asnPppkDisplay" class="text-xl font-extrabold font-mono text-emerald-700 underline decoration-emerald-400 underline-offset-4 group-hover:scale-105 transition-transform">0</span>
+                    <button type="button" onclick="openAsnDetailModal('PPPK')" class="p-3.5 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/90 border border-emerald-200/80 transition-all text-left cursor-pointer group">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700 block">PPPK</span>
+                        <span id="asnPppkDisplay" class="text-lg md:text-xl font-extrabold font-mono text-emerald-900 underline decoration-emerald-400 underline-offset-4 block mt-1 group-hover:scale-105 origin-left transition-transform">0</span>
+                        <span class="text-[10px] text-emerald-600/80 mt-0.5 block">Klik rincian</span>
                     </button>
 
-                    <button type="button" onclick="openAsnDetailModal('PPPK_PW')" class="flex items-center justify-between p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-100/80 border border-amber-200/80 transition-all text-left cursor-pointer group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm">
-                                <i class="fa-solid fa-user-clock text-lg"></i>
-                            </div>
-                            <div>
-                                <span class="text-xs font-extrabold text-amber-900 block">PPPK PW</span>
-                                <span class="text-[11px] text-amber-700/80">Klik angka untuk rincian</span>
-                            </div>
-                        </div>
-                        <span id="asnPppkPwDisplay" class="text-xl font-extrabold font-mono text-amber-700 underline decoration-amber-400 underline-offset-4 group-hover:scale-105 transition-transform">0</span>
+                    <button type="button" onclick="openAsnDetailModal('PPPK_PW')" class="p-3.5 rounded-2xl bg-amber-50/70 hover:bg-amber-100/90 border border-amber-200/80 transition-all text-left cursor-pointer group">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 block">PPPK PW</span>
+                        <span id="asnPppkPwDisplay" class="text-lg md:text-xl font-extrabold font-mono text-amber-900 underline decoration-amber-400 underline-offset-4 block mt-1 group-hover:scale-105 origin-left transition-transform">0</span>
+                        <span class="text-[10px] text-amber-600/80 mt-0.5 block">Klik rincian</span>
+                    </button>
+
+                    <button type="button" onclick="openAsnDetailModal('ALL')" class="p-3.5 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-md shadow-blue-600/20 transition-all text-left cursor-pointer group">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-100 block">TOTAL ASN</span>
+                        <span id="asnTotalDisplay" class="text-lg md:text-xl font-extrabold font-mono text-white underline decoration-blue-200/70 underline-offset-4 block mt-1 group-hover:scale-105 origin-left transition-transform">0</span>
+                        <span class="text-[10px] text-blue-100/90 mt-0.5 block">Lihat tabel lengkap</span>
                     </button>
                 </div>
             </div>
@@ -443,7 +425,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 self-end sm:self-center">
+                <div class="flex items-center gap-2 self-end sm:self-center flex-wrap">
                     <button type="button" onclick="setAsnModalFilter('ALL')" id="filterBtnALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm transition">Semua</button>
                     <button type="button" onclick="setAsnModalFilter('PNS')" id="filterBtnPNS" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition">PNS</button>
                     <button type="button" onclick="setAsnModalFilter('PPPK')" id="filterBtnPPPK" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-emerald-50 transition">PPPK</button>
@@ -733,8 +715,8 @@
                             'rgb(5, 150, 105)',
                             'rgb(245, 158, 11)'
                         ],
-                        borderWidth: 2,
-                        borderRadius: 10
+                        borderWidth: 1.5,
+                        borderRadius: 6
                     }]
                 },
                 options: {
@@ -744,11 +726,12 @@
                         legend: { display: false }
                     },
                     scales: {
+                        x: {
+                            ticks: { font: { size: 10, weight: 'bold' } }
+                        },
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                precision: 0
-                            }
+                            ticks: { font: { size: 10 } }
                         }
                     },
                     onClick: (_event, elements) => {
@@ -898,7 +881,7 @@
                     document.getElementById('asnPppkPwDisplay').innerText = fmtNum(data.asn.pppkPw);
                     document.getElementById('asnTotalDisplay').innerText = fmtNum(data.asn.total);
                     if (data.asn.keterangan) {
-                        document.getElementById('asnKeterangan').innerText = `${data.asn.keterangan} • Klik pada angka jumlah untuk melihat rincian tabel pop-up.`;
+                        document.getElementById('asnKeterangan').innerText = `${data.asn.keterangan} • Klik pada angka jumlah untuk melihat rincian tabel rekapitulasi.`;
                     }
                     renderAsnChart(data.asn);
                 }
