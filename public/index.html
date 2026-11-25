@@ -6,6 +6,7 @@
     <title>E-Ladinin v3.0 • Elektronik Layanan Dinas Pendidikan</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -117,6 +118,7 @@
             
             <div class="hidden md:flex items-center gap-x-8 text-sm font-semibold text-slate-600">
                 <a href="#" class="hover:text-blue-700 transition-colors">Beranda</a>
+                <a href="#statistik-asn" class="hover:text-blue-700 transition-colors">Grafik ASN</a>
                 <a href="#layanan" class="text-blue-700 font-bold">Daftar Layanan</a>
                 <a href="#faq" class="hover:text-blue-700 transition-colors">Bantuan/FAQ</a>
                 <a id="navMekanismeLink" href="#" target="_blank" class="hover:text-blue-700 transition-colors flex items-center gap-x-1 text-slate-700">
@@ -174,7 +176,7 @@
     </header>
 
     <!-- Widget SKM 3D -->
-    <section class="max-w-screen-xl mx-auto px-6 -mt-10 relative z-20 mb-12">
+    <section class="max-w-screen-xl mx-auto px-6 -mt-10 relative z-20 mb-10">
         <div class="card-3d bg-slate-900/90 text-white rounded-3xl p-6 md:p-8 backdrop-blur-xl border border-blue-500/30 shadow-2xl relative overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
                 <div class="md:col-span-5 flex items-center gap-6 border-b md:border-b-0 md:border-r border-slate-800 pb-6 md:pb-0 md:pr-6">
@@ -208,6 +210,82 @@
                         <span class="flex items-center gap-1"><i class="fa-solid fa-circle-check text-emerald-400"></i> Transparan</span>
                         <span class="flex items-center gap-1"><i class="fa-solid fa-users text-blue-400"></i> Berbasis Responden Real</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: GRAFIK JUMLAH ASN (PNS, PPPK, PPPK PW) -->
+    <section id="statistik-asn" class="max-w-screen-xl mx-auto px-6 mb-12 relative z-20">
+        <div class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200/90 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-100">
+                <div>
+                    <div class="flex items-center gap-x-2 text-blue-700 font-bold text-xs uppercase tracking-widest mb-1">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>Rekapitulasi Kepegawaian</span>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Grafik Jumlah ASN</h2>
+                    <p id="asnKeterangan" class="text-xs text-slate-500 mt-1">Klik pada angka jumlah untuk melihat rincian tabel pop-up.</p>
+                </div>
+
+                <!-- Angka Total ASN yang bisa diklik -->
+                <button type="button" onclick="openAsnDetailModal('ALL')" class="group text-left bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-5 py-3.5 rounded-2xl shadow-md shadow-blue-600/20 transition-all cursor-pointer">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-100 block">Total ASN (Klik Rincian)</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="asnTotalDisplay" class="text-2xl font-extrabold font-mono underline decoration-blue-300/60 underline-offset-4">0</span>
+                        <i class="fa-solid fa-table-list text-xs text-blue-200 group-hover:scale-110 transition-transform"></i>
+                    </div>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Grafik Chart.js -->
+                <div class="lg:col-span-7 bg-slate-50/80 rounded-2xl p-4 border border-slate-200/70">
+                    <div class="relative h-64 w-full">
+                        <canvas id="asnChartCanvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Kartu Angka Per Kategori (Klik untuk buka Pop-up Rincian) -->
+                <div class="lg:col-span-5 grid grid-cols-1 gap-3.5">
+                    <button type="button" onclick="openAsnDetailModal('PNS')" class="flex items-center justify-between p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/80 transition-all text-left cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-id-badge text-lg"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-blue-900 block">PNS</span>
+                                <span class="text-[11px] text-blue-700/80">Klik angka untuk rincian</span>
+                            </div>
+                        </div>
+                        <span id="asnPnsDisplay" class="text-xl font-extrabold font-mono text-blue-700 underline decoration-blue-400 underline-offset-4 group-hover:scale-105 transition-transform">0</span>
+                    </button>
+
+                    <button type="button" onclick="openAsnDetailModal('PPPK')" class="flex items-center justify-between p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 transition-all text-left cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-user-check text-lg"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-emerald-900 block">PPPK</span>
+                                <span class="text-[11px] text-emerald-700/80">Klik angka untuk rincian</span>
+                            </div>
+                        </div>
+                        <span id="asnPppkDisplay" class="text-xl font-extrabold font-mono text-emerald-700 underline decoration-emerald-400 underline-offset-4 group-hover:scale-105 transition-transform">0</span>
+                    </button>
+
+                    <button type="button" onclick="openAsnDetailModal('PPPK_PW')" class="flex items-center justify-between p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-100/80 border border-amber-200/80 transition-all text-left cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-sm">
+                                <i class="fa-solid fa-user-clock text-lg"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs font-extrabold text-amber-900 block">PPPK PW</span>
+                                <span class="text-[11px] text-amber-700/80">Klik angka untuk rincian</span>
+                            </div>
+                        </div>
+                        <span id="asnPppkPwDisplay" class="text-xl font-extrabold font-mono text-amber-700 underline decoration-amber-400 underline-offset-4 group-hover:scale-105 transition-transform">0</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -344,6 +422,76 @@
             </div>
         </div>
     </footer>
+
+    <!-- POP-UP MODAL RINCIAN TABEL REKAP JUMLAH ASN (TANPA KOLOM ABK) -->
+    <div id="asnDetailModal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-[105] flex items-center justify-center p-3 sm:p-6">
+        <div class="bg-white rounded-3xl max-w-6xl w-full p-5 sm:p-7 shadow-2xl border border-blue-200/80 relative flex flex-col max-h-[90vh]">
+            <!-- Header Pop-up Senada Tema E-Ladinin -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0">
+                        <i class="fa-solid fa-table-cells text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 id="asnModalTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">REKAP JUMLAH ASN</h3>
+                            <span id="asnModalBadge" class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                                SEMUA KATEGORI
+                            </span>
+                        </div>
+                        <p id="asnModalSubtitle" class="text-xs text-slate-500 mt-0.5">Rincian data berdasarkan Jabatan, Sekolah Negeri, dan Sekolah Swasta</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                    <button type="button" onclick="setAsnModalFilter('ALL')" id="filterBtnALL" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm transition">Semua</button>
+                    <button type="button" onclick="setAsnModalFilter('PNS')" id="filterBtnPNS" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition">PNS</button>
+                    <button type="button" onclick="setAsnModalFilter('PPPK')" id="filterBtnPPPK" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-emerald-50 transition">PPPK</button>
+                    <button type="button" onclick="setAsnModalFilter('PPPK_PW')" id="filterBtnPPPK_PW" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-amber-50 transition">PPPK PW</button>
+                    <button type="button" onclick="closeAsnDetailModal()" class="ml-1 w-9 h-9 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 font-bold flex items-center justify-center text-lg transition">&times;</button>
+                </div>
+            </div>
+
+            <!-- Kontainer Tabel Responsif -->
+            <div class="overflow-auto flex-grow rounded-2xl border border-slate-200/90 shadow-inner bg-slate-50/40">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="sticky top-0 z-10 shadow-sm">
+                        <tr class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white text-[11px] uppercase tracking-wider">
+                            <th rowspan="2" class="py-3 px-3 border-b border-r border-slate-700/80 text-center w-12">No.</th>
+                            <th rowspan="2" class="py-3 px-3.5 border-b border-r border-slate-700/80 min-w-[180px]">Jabatan</th>
+                            <th colspan="4" class="py-2 px-3 border-b border-r border-blue-700/60 text-center bg-blue-900/80 text-blue-100">ASN di Sekolah Negeri</th>
+                            <th colspan="4" class="py-2 px-3 border-b border-r border-indigo-700/60 text-center bg-indigo-900/80 text-indigo-100">ASN di Sekolah Swasta</th>
+                            <th rowspan="2" class="py-3 px-3.5 border-b border-slate-700/80 text-right bg-blue-950 text-emerald-300 font-extrabold">Total ASN</th>
+                        </tr>
+                        <tr class="bg-slate-800 text-slate-200 text-[10px] font-bold">
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right">PNS</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right">PPPK</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right">PPPK PW</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right bg-blue-900/50 text-blue-200">Total</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right">PNS</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right">PPPK</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right">PPPK PW</th>
+                            <th class="py-2 px-2.5 border-b border-r border-slate-700 text-right bg-indigo-900/50 text-indigo-200">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asnRekapTableBody" class="divide-y divide-slate-200/80 bg-white font-mono">
+                        <!-- Diisi otomatis via JS -->
+                    </tbody>
+                    <tfoot id="asnRekapTableFoot" class="sticky bottom-0 z-10 font-mono font-extrabold bg-blue-50 text-slate-900 border-t-2 border-blue-600">
+                        <!-- Diisi otomatis via JS -->
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Footer Pop-up -->
+            <div class="pt-4 mt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                <span><i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Data bersumber langsung dari Google Spreadsheet.</span>
+                <button type="button" onclick="closeAsnDetailModal()" class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-xs rounded-xl shadow-md transition">
+                    Tutup Rincian
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Mascot Floating GIF -->
     <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end group pointer-events-auto">
@@ -532,6 +680,20 @@
     <script>
         let allServices = [];
         let globalFooterData = {};
+        let globalAsnData = {
+            pns: 0,
+            pppk: 0,
+            pppkPw: 0,
+            total: 0,
+            keterangan: "REKAP JUMLAH ASN",
+            rekapItems: [],
+            rekapTotal: {
+                negeriPns: 0, negeriPppk: 0, negeriPppkPw: 0, negeriTotal: 0,
+                swastaPns: 0, swastaPppk: 0, swastaPppkPw: 0, swastaTotal: 0, totalAsn: 0
+            }
+        };
+        let currentAsnFilter = 'ALL';
+        let asnChartInstance = null;
 
         function updateClock() {
             const now = new Date();
@@ -541,6 +703,170 @@
         }
         updateClock();
         setInterval(updateClock, 1000);
+
+        function fmtNum(n) {
+            return Number(n || 0).toLocaleString('id-ID');
+        }
+
+        function renderAsnChart(asn) {
+            const ctx = document.getElementById('asnChartCanvas');
+            if (!ctx) return;
+
+            if (asnChartInstance) {
+                asnChartInstance.destroy();
+            }
+
+            asnChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['PNS', 'PPPK', 'PPPK PW'],
+                    datasets: [{
+                        label: 'Jumlah Pegawai',
+                        data: [asn.pns, asn.pppk, asn.pppkPw],
+                        backgroundColor: [
+                            'rgba(37, 99, 235, 0.85)',
+                            'rgba(5, 150, 105, 0.85)',
+                            'rgba(245, 158, 11, 0.85)'
+                        ],
+                        borderColor: [
+                            'rgb(37, 99, 235)',
+                            'rgb(5, 150, 105)',
+                            'rgb(245, 158, 11)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    onClick: (_event, elements) => {
+                        if (elements && elements.length > 0) {
+                            const idx = elements[0].index;
+                            const keys = ['PNS', 'PPPK', 'PPPK_PW'];
+                            openAsnDetailModal(keys[idx]);
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateFilterButtonStyles(activeFilter) {
+            const map = {
+                ALL: 'bg-blue-600 text-white shadow-sm',
+                PNS: 'bg-blue-600 text-white shadow-sm',
+                PPPK: 'bg-emerald-600 text-white shadow-sm',
+                PPPK_PW: 'bg-amber-500 text-white shadow-sm'
+            };
+            ['ALL', 'PNS', 'PPPK', 'PPPK_PW'].forEach(key => {
+                const btn = document.getElementById(`filterBtn${key}`);
+                if (!btn) return;
+                if (key === activeFilter) {
+                    btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold transition ${map[key]}`;
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                }
+            });
+        }
+
+        function renderRekapTableInModal(filterType) {
+            const tbody = document.getElementById('asnRekapTableBody');
+            const tfoot = document.getElementById('asnRekapTableFoot');
+            if (!tbody || !tfoot) return;
+
+            const items = globalAsnData.rekapItems || [];
+            const tot = globalAsnData.rekapTotal || {};
+
+            const hiNegPns = filterType === 'PNS' ? 'bg-blue-100/80 text-blue-900 font-extrabold' : '';
+            const hiSwsPns = filterType === 'PNS' ? 'bg-blue-100/80 text-blue-900 font-extrabold' : '';
+            const hiNegPppk = filterType === 'PPPK' ? 'bg-emerald-100/80 text-emerald-900 font-extrabold' : '';
+            const hiSwsPppk = filterType === 'PPPK' ? 'bg-emerald-100/80 text-emerald-900 font-extrabold' : '';
+            const hiNegPw = filterType === 'PPPK_PW' ? 'bg-amber-100/80 text-amber-900 font-extrabold' : '';
+            const hiSwsPw = filterType === 'PPPK_PW' ? 'bg-amber-100/80 text-amber-900 font-extrabold' : '';
+
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="py-8 px-4 text-center font-sans text-slate-500">
+                            Data rincian pada sheet <strong>Rekap</strong> belum terisi. Pastikan tab <strong>Rekap</strong> memiliki kolom A:K (tanpa ABK).
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = items.map(row => `
+                    <tr class="hover:bg-blue-50/50 transition-colors">
+                        <td class="py-2.5 px-3 border-r border-slate-200/70 text-center text-slate-500">${row.no}</td>
+                        <td class="py-2.5 px-3.5 border-r border-slate-200/70 font-sans font-semibold text-slate-800">${row.jabatan}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right ${hiNegPns}">${fmtNum(row.negeriPns)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right ${hiNegPppk}">${fmtNum(row.negeriPppk)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right ${hiNegPw}">${fmtNum(row.negeriPppkPw)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right font-bold bg-blue-50/40 text-blue-900">${fmtNum(row.negeriTotal)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right ${hiSwsPns}">${fmtNum(row.swastaPns)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right ${hiSwsPppk}">${fmtNum(row.swastaPppk)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right ${hiSwsPw}">${fmtNum(row.swastaPppkPw)}</td>
+                        <td class="py-2.5 px-2.5 border-r border-slate-200/70 text-right font-bold bg-indigo-50/40 text-indigo-900">${fmtNum(row.swastaTotal)}</td>
+                        <td class="py-2.5 px-3.5 text-right font-extrabold text-blue-700 bg-slate-50/80">${fmtNum(row.totalAsn)}</td>
+                    </tr>
+                `).join('');
+            }
+
+            tfoot.innerHTML = `
+                <tr class="bg-gradient-to-r from-blue-100/90 via-indigo-100/90 to-blue-100/90 text-slate-900">
+                    <td colspan="2" class="py-3 px-3.5 border-r border-blue-200 text-center font-sans font-extrabold tracking-wide text-blue-950">TOTAL</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right">${fmtNum(tot.negeriPns)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right">${fmtNum(tot.negeriPppk)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right">${fmtNum(tot.negeriPppkPw)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right bg-blue-200/60 text-blue-950">${fmtNum(tot.negeriTotal)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right">${fmtNum(tot.swastaPns)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right">${fmtNum(tot.swastaPppk)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right">${fmtNum(tot.swastaPppkPw)}</td>
+                    <td class="py-3 px-2.5 border-r border-blue-200 text-right bg-indigo-200/60 text-indigo-950">${fmtNum(tot.swastaTotal)}</td>
+                    <td class="py-3 px-3.5 text-right text-sm text-blue-900 bg-blue-200/80">${fmtNum(tot.totalAsn)}</td>
+                </tr>
+            `;
+        }
+
+        function setAsnModalFilter(type) {
+            currentAsnFilter = type;
+            const titleEl = document.getElementById('asnModalTitle');
+            const badgeEl = document.getElementById('asnModalBadge');
+            const subEl = document.getElementById('asnModalSubtitle');
+
+            const labelMap = {
+                ALL: { title: 'REKAP JUMLAH ASN', badge: 'SEMUA KATEGORI', sub: `Total Gabungan: ${fmtNum(globalAsnData.total)} ASN (PNS: ${fmtNum(globalAsnData.pns)} • PPPK: ${fmtNum(globalAsnData.pppk)} • PPPK PW: ${fmtNum(globalAsnData.pppkPw)})` },
+                PNS: { title: 'RINCIAN JUMLAH PNS', badge: 'SOROTAN: PNS', sub: `Total PNS: ${fmtNum(globalAsnData.pns)} pegawai (Sekolah Negeri + Sekolah Swasta)` },
+                PPPK: { title: 'RINCIAN JUMLAH PPPK', badge: 'SOROTAN: PPPK', sub: `Total PPPK: ${fmtNum(globalAsnData.pppk)} pegawai (Sekolah Negeri + Sekolah Swasta)` },
+                PPPK_PW: { title: 'RINCIAN JUMLAH PPPK PW', badge: 'SOROTAN: PPPK PW', sub: `Total PPPK PW: ${fmtNum(globalAsnData.pppkPw)} pegawai (Sekolah Negeri + Sekolah Swasta)` }
+            };
+
+            const cfg = labelMap[type] || labelMap.ALL;
+            titleEl.innerText = cfg.title;
+            badgeEl.innerText = cfg.badge;
+            subEl.innerText = cfg.sub;
+
+            updateFilterButtonStyles(type);
+            renderRekapTableInModal(type);
+        }
+
+        function openAsnDetailModal(type = 'ALL') {
+            setAsnModalFilter(type);
+            document.getElementById('asnDetailModal').classList.remove('hidden');
+        }
+
+        function closeAsnDetailModal() {
+            document.getElementById('asnDetailModal').classList.add('hidden');
+        }
 
         async function loadData() {
             try {
@@ -563,6 +889,18 @@
                     if (s.mutu) document.getElementById('skmMutu').innerText = `MUTU ${s.mutu}`;
                     if (s.kinerja) document.getElementById('skmKinerja').innerText = s.kinerja;
                     if (s.catatan) document.getElementById('skmCatatan').innerText = s.catatan;
+                }
+
+                if (data.asn) {
+                    globalAsnData = data.asn;
+                    document.getElementById('asnPnsDisplay').innerText = fmtNum(data.asn.pns);
+                    document.getElementById('asnPppkDisplay').innerText = fmtNum(data.asn.pppk);
+                    document.getElementById('asnPppkPwDisplay').innerText = fmtNum(data.asn.pppkPw);
+                    document.getElementById('asnTotalDisplay').innerText = fmtNum(data.asn.total);
+                    if (data.asn.keterangan) {
+                        document.getElementById('asnKeterangan').innerText = `${data.asn.keterangan} • Klik pada angka jumlah untuk melihat rincian tabel pop-up.`;
+                    }
+                    renderAsnChart(data.asn);
                 }
 
                 const faqContainer = document.getElementById('faq-container');
@@ -598,7 +936,6 @@
                     });
                 }
 
-                // Render form IG di Admin dengan 2 input terpisah (Link Gambar & Link Postingan)
                 renderIgAdminForm(data.instagramRaw || []);
 
                 if (data.footer) {
@@ -622,7 +959,6 @@
                     if (f.copyright) document.getElementById('fCopyright').innerText = f.copyright;
                     if (f.pengembang) document.getElementById('fPengembang').innerText = f.pengembang;
 
-                    // Injeksi About Modal
                     if (f.about_versi) document.getElementById('aboutVersiBadge').innerText = f.about_versi;
                     if (f.about_judul_pencetus) document.getElementById('labelPencetus').innerText = f.about_judul_pencetus;
                     if (f.about_pencetus) document.getElementById('aboutPencetus').innerText = f.about_pencetus;
@@ -632,7 +968,6 @@
                     if (f.about_pembuat) document.getElementById('aboutPembuat').innerText = f.about_pembuat;
                     if (f.about_deskripsi) document.getElementById('aboutDeskripsi').innerText = f.about_deskripsi;
 
-                    // Sync Form Admin Pengaturan
                     if(document.getElementById('cfgAboutVersi')) document.getElementById('cfgAboutVersi').value = f.about_versi || '';
                     if(document.getElementById('cfgTelepon')) document.getElementById('cfgTelepon').value = f.telepon || '';
                     if(document.getElementById('cfgAlamat')) document.getElementById('cfgAlamat').value = f.alamat || '';
