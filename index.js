@@ -25,24 +25,17 @@ const getSheetsClient = async () => {
     return google.sheets({ version: 'v4', auth: client });
 };
 
-// Fungsi Otomatis Konversi Link Google Drive & IG Menjadi Direct Image Link
 async function resolveIgThumbnail(url) {
     if (!url || url === '#') return 'https://via.placeholder.com/300';
-    
-    // 1. Jika link Google Drive standar (share link), otomatis ubah jadi direct link lh3
     if (url.includes('drive.google.com')) {
         const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
             return `https://lh3.googleusercontent.com/d/${match[1]}`;
         }
     }
-
-    // 2. Jika sudah direct link gambar atau lh3 googleusercontent
     if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i) || url.includes('lh3.googleusercontent.com')) {
         return url;
     }
-    
-    // 3. Fallback jika link postingan IG biasa
     try {
         if (url.includes('/p/') || url.includes('/reel/')) {
             const cleanUrl = url.split('?')[0];
@@ -54,7 +47,16 @@ async function resolveIgThumbnail(url) {
     }
 }
 
-// API Utama: Membaca Data Spreadsheet Realtime
+function parseNumber(val) {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === 'number') return Math.round(val);
+    const raw = String(val).trim();
+    if (!raw) return 0;
+    const cleaned = raw.replace(/\s+/g, '').replace(/\./g, '').replace(/,/g, '').replace(/[^0-9-]/g, '');
+    const num = parseInt(cleaned, 10);
+    return Number.isNaN(num) ? 0 : num;
+}
+
 app.get('/api/data', async (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -85,8 +87,8 @@ app.get('/api/data', async (req, res) => {
                     });
                 }
             }
-        } catch (e) { 
-            console.error("Error Sheet Layanan:", e.message); 
+        } catch (e) {
+            console.error("Error Sheet Layanan:", e.message);
         }
 
         // 2. Sheet Pengumuman
@@ -141,8 +143,8 @@ app.get('/api/data', async (req, res) => {
                     catatan: sRow[4] || "Berdasarkan hasil survei responden pengguna layanan digital Dinas Pendidikan Kabupaten Bangkalan."
                 };
             }
-        } catch (e) { 
-            console.error("Error Sheet SKM:", e.message); 
+        } catch (e) {
+            console.error("Error Sheet SKM:", e.message);
         }
 
         // 5. Sheet Instagram Feed
@@ -171,7 +173,150 @@ app.get('/api/data', async (req, res) => {
             console.error("Error Sheet Instagram:", e.message);
         }
 
-        // 6. Sheet Footer & Settings Data
+        // 6. Sheet Rekap & Sheet ASN
+        let rekapRows = [];
+        let rekapError = null;
+        try {
+            const resRekap = await sheets.spreadsheets.values.get({
+                spreadsheetId,
+                range: 'Rekap!A1:K100',
+            });
+            rekapRows = resRekap.data.values || [];
+        } catch (e) {
+            rekapError = e.message;
+            console.error("Error Sheet Rekap:", e.message);
+        }
+
+        let explicitTotalRow = null;
+        const items = [];
+        let sumNegPns = 0, sumNegPppk = 0, sumNegPw = 0, sumNegTot = 0;
+        let sumSwsPns = 0, sumSwsPppk = 0, sumSwsPw = 0, sumSwsTot = 0, sumTotAsn = 0;
+
+        for (let i = 0; i < rekapRows.length; i++) {
+            const r = rekapRows[i] || [];
+            const colA = String(r[0] || '').trim();
+            const colB = String(r[1] || '').trim();
+
+            if (colB.toUpperCase() === 'TOTAL' || colA.toUpperCase() === 'TOTAL') {
+                explicitTotalRow = r;
+                continue;
+            }
+
+            if (/^\d+$/.test(colA) && colB) {
+                const negeriPns = parseNumber(r[2]);
+                const negeriPppk = parseNumber(r[3]);
+                const negeriPppkPw = parseNumber(r[4]);
+                const negeriTotal = r[5] !== undefined && String(r[5]).trim() !== ''
+                    ? parseNumber(r[5])
+                    : (negeriPns + negeriPppk + negeriPppkPw);
+
+                const swastaPns = parseNumber(r[6]);
+                const swastaPppk = parseNumber(r[7]);
+                const swastaPppkPw = parseNumber(r[8]);
+                const swastaTotal = r[9] !== undefined && String(r[9]).trim() !== ''
+                    ? parseNumber(r[9])
+                    : (swastaPns + swastaPppk + swastaPppkPw);
+
+                const totalAsn = r[10] !== undefined && String(r[10]).trim() !== ''
+                    ? parseNumber(r[10])
+                    : (negeriTotal + swastaTotal);
+
+                items.push({
+                    no: parseNumber(colA),
+                    jabatan: colB,
+                    negeriPns,
+                    negeriPppk,
+                    negeriPppkPw,
+                    negeriTotal,
+                    swastaPns,
+                    swastaPppk,
+                    swastaPppkPw,
+                    swastaTotal,
+                    totalAsn
+                });
+
+                sumNegPns += negeriPns;
+                sumNegPppk += negeriPppk;
+                sumNegPw += negeriPppkPw;
+                sumNegTot += negeriTotal;
+                sumSwsPns += swastaPns;
+                sumSwsPppk += swastaPppk;
+                sumSwsPw += swastaPppkPw;
+                sumSwsTot += swastaTotal;
+                sumTotAsn += totalAsn;
+            }
+        }
+
+        let rekapTotalObj = {
+            negeriPns: sumNegPns,
+            negeriPppk: sumNegPppk,
+            negeriPppkPw: sumNegPw,
+            negeriTotal: sumNegTot,
+            swastaPns: sumSwsPns,
+            swastaPppk: sumSwsPppk,
+            swastaPppkPw: sumSwsPw,
+            swastaTotal: sumSwsTot,
+            totalAsn: sumTotAsn
+        };
+
+        if (explicitTotalRow) {
+            rekapTotalObj = {
+                negeriPns: explicitTotalRow[2] !== undefined && String(explicitTotalRow[2]).trim() !== '' ? parseNumber(explicitTotalRow[2]) : sumNegPns,
+                negeriPppk: explicitTotalRow[3] !== undefined && String(explicitTotalRow[3]).trim() !== '' ? parseNumber(explicitTotalRow[3]) : sumNegPppk,
+                negeriPppkPw: explicitTotalRow[4] !== undefined && String(explicitTotalRow[4]).trim() !== '' ? parseNumber(explicitTotalRow[4]) : sumNegPw,
+                negeriTotal: explicitTotalRow[5] !== undefined && String(explicitTotalRow[5]).trim() !== '' ? parseNumber(explicitTotalRow[5]) : sumNegTot,
+                swastaPns: explicitTotalRow[6] !== undefined && String(explicitTotalRow[6]).trim() !== '' ? parseNumber(explicitTotalRow[6]) : sumSwsPns,
+                swastaPppk: explicitTotalRow[7] !== undefined && String(explicitTotalRow[7]).trim() !== '' ? parseNumber(explicitTotalRow[7]) : sumSwsPppk,
+                swastaPppkPw: explicitTotalRow[8] !== undefined && String(explicitTotalRow[8]).trim() !== '' ? parseNumber(explicitTotalRow[8]) : sumSwsPw,
+                swastaTotal: explicitTotalRow[9] !== undefined && String(explicitTotalRow[9]).trim() !== '' ? parseNumber(explicitTotalRow[9]) : sumSwsTot,
+                totalAsn: explicitTotalRow[10] !== undefined && String(explicitTotalRow[10]).trim() !== '' ? parseNumber(explicitTotalRow[10]) : sumTotAsn
+            };
+        }
+
+        let pnsVal = rekapTotalObj.negeriPns + rekapTotalObj.swastaPns;
+        let pppkVal = rekapTotalObj.negeriPppk + rekapTotalObj.swastaPppk;
+        let pppkPwVal = rekapTotalObj.negeriPppkPw + rekapTotalObj.swastaPppkPw;
+        let totalVal = rekapTotalObj.totalAsn || (pnsVal + pppkVal + pppkPwVal);
+        let ketVal = "REKAP JUMLAH ASN";
+
+        let asnSheetRows = [];
+        try {
+            const resAsn = await sheets.spreadsheets.values.get({
+                spreadsheetId,
+                range: 'ASN!A1:B20',
+            });
+            asnSheetRows = resAsn.data.values || [];
+            asnSheetRows.forEach(row => {
+                const k = String(row[0] || '').toUpperCase().trim();
+                const v = row[1];
+                if ((k === 'PERIODE' || k === 'KETERANGAN') && v) {
+                    ketVal = String(v).trim();
+                }
+                if (items.length === 0 && pnsVal === 0 && pppkVal === 0 && pppkPwVal === 0) {
+                    if (k === 'PNS') pnsVal = parseNumber(v);
+                    else if (k === 'PPPK') pppkVal = parseNumber(v);
+                    else if (k === 'PPPK PW' || k === 'PPPK_PW' || k === 'PPPKPW') pppkPwVal = parseNumber(v);
+                    totalVal = pnsVal + pppkVal + pppkPwVal;
+                }
+            });
+        } catch (_eAsn) {}
+
+        const asn = {
+            pns: pnsVal,
+            pppk: pppkVal,
+            pppkPw: pppkPwVal,
+            total: totalVal,
+            keterangan: ketVal,
+            rekapItems: items,
+            rekapTotal: rekapTotalObj,
+            debug: {
+                rekapRowsCount: rekapRows.length,
+                rekapError,
+                asnRowsCount: asnSheetRows.length
+            }
+        };
+
+        // 7. Sheet Footer & Settings Data
         let footer = {
             deskripsi: "Sistem Elektronik Layanan Dinas Pendidikan Kabupaten Bangkalan.",
             alamat: "Jl. Soekarno Hatta No. 23, Bangkalan - Madura",
@@ -230,17 +375,16 @@ app.get('/api/data', async (req, res) => {
                 }).catch(err => console.error("Gagal update visit_count:", err.message));
             }
 
-        } catch (e) { 
-            console.error("Error Sheet Footer/Counter:", e.message); 
+        } catch (e) {
+            console.error("Error Sheet Footer/Counter:", e.message);
         }
 
-        res.json({ services, announcement, faqs, skm, instagramFeed, instagramRaw, footer, visitCount: currentVisitCount });
+        res.json({ services, announcement, faqs, skm, asn, instagramFeed, instagramRaw, footer, visitCount: currentVisitCount });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Endpoint Tambah Layanan
 app.post('/api/add-service', async (req, res) => {
     try {
         const { judul, deskripsi, link, icon, kategori } = req.body;
@@ -268,7 +412,6 @@ app.post('/api/add-service', async (req, res) => {
     }
 });
 
-// Endpoint Simpan Pengaturan Footer & About
 app.post('/api/update-settings', async (req, res) => {
     try {
         const settings = req.body;
@@ -313,10 +456,9 @@ app.post('/api/update-settings', async (req, res) => {
     }
 });
 
-// Endpoint Update Feed Instagram dari Panel Admin (Menyimpan Judul, Gambar, Link Tujuan)
 app.post('/api/update-instagram', async (req, res) => {
     try {
-        const { posts } = req.body; // Array berisi 4 object {judul, gambar, link}
+        const { posts } = req.body;
         const sheets = await getSheetsClient();
         const spreadsheetId = process.env.SPREADSHEET_ID;
 
